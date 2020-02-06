@@ -1,0 +1,18 @@
+# Keep this to false if you don't know what you are doing
+Debug: false
+
+# Items' display names
+MaskDisplayName: "&2AntiVirus Mask"
+VaxinDisplayName: "&bVaxin"
+
+# Minimum number of Online Players to start the virus spreading
+MinOnlinePlayers: 1
+
+# The time (in seconds) between each time the virus tries to infect a random player
+InfectionSpreadDelay: 10
+
+# The chance that a player has of catching a virus (from 0(%) to 100(%))
+InfectionPercentage: 40
+
+# Should a player receive a message when the mask saves him from a virus?
+MsgOnMaskHit: false
