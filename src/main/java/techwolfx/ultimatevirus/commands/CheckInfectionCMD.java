@@ -11,7 +11,7 @@ public class CheckInfectionCMD implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof Player){
             Player p = (Player) sender;
-            p.sendMessage("§cInfected: §f" + Ultimatevirus.getInstance().checkInfection(p.getName()));
+            p.sendMessage("§cInfected: §f" + Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()));
         }
         return false;
     }

@@ -14,23 +14,33 @@ import techwolfx.ultimatevirus.commands.CheckInfectionCMD;
 import techwolfx.ultimatevirus.commands.MaskCMD;
 import techwolfx.ultimatevirus.commands.ReloadCMD;
 import techwolfx.ultimatevirus.commands.VaxinCMD;
+import techwolfx.ultimatevirus.database.Database;
+import techwolfx.ultimatevirus.database.SQLite;
 import techwolfx.ultimatevirus.files.InfectedList;
 import techwolfx.ultimatevirus.files.Language;
 import techwolfx.ultimatevirus.listeners.PlayerEvents;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public final class Ultimatevirus extends JavaPlugin {
 
     private ArrayList<String> playersOnline = new ArrayList<>();
     private static Ultimatevirus instance;
+    private Database db;
 
     public ArrayList<String> getPlayersOnline(){
         return playersOnline;
     }
     public static Ultimatevirus getInstance(){
         return instance;
+    }
+    public Database getRDatabase() {
+        return this.db;
     }
 
     private void infectedListSetup(){
@@ -60,15 +70,13 @@ public final class Ultimatevirus extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
-        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Plugin Enabled.");
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
         Objects.requireNonNull(getCommand("mask")).setExecutor(new MaskCMD());
         Objects.requireNonNull(getCommand("vaxin")).setExecutor(new VaxinCMD());
         Objects.requireNonNull(getCommand("virusreload")).setExecutor(new ReloadCMD());
         Objects.requireNonNull(getCommand("checkvirus")).setExecutor(new CheckInfectionCMD());
-        saveDefaultConfig();
         instance = this;
+        saveDefaultConfig();
 
         // infectedList.yml Setup
         infectedListSetup();
@@ -76,10 +84,15 @@ public final class Ultimatevirus extends JavaPlugin {
         // lang.yml Setup
         langFileSetup();
 
+        this.db = new SQLite(this);
+        this.db.load();
+        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Plugin Enabled.");
+
         BukkitScheduler scheduler = getServer().getScheduler();
         int checkInterval = getConfig().getInt("InfectionSpreadDelay");
 
         scheduler.scheduleSyncRepeatingTask(this, this::mainProcess, 0L, checkInterval *20);
+
     }
 
     public void setInfected(Player p){
