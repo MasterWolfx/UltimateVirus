@@ -16,11 +16,15 @@ import techwolfx.ultimatevirus.Ultimatevirus;
 
 import java.util.Random;
 
-
 public class PlayerEvents implements Listener {
+
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Ultimatevirus.getInstance().getPlayersOnline().add(e.getPlayer().getName());
+        if(!Ultimatevirus.getInstance().getRDatabase().isPlayerRegistered(e.getPlayer().getName())){
+            Ultimatevirus.getInstance().getRDatabase().setTokens(e.getPlayer(), false, 0);
+        }
         if(Ultimatevirus.getInstance().getConfig().getBoolean("Debug"))
         Bukkit.getConsoleSender().sendMessage("Current List (Join): " + Ultimatevirus.getInstance().getPlayersOnline());
     }
@@ -40,7 +44,7 @@ public class PlayerEvents implements Listener {
             if(item.getType() == Material.POTION && item.getItemMeta().getDisplayName().equals(vaxinName)) {
                 Player p = e.getPlayer();
 
-                if( Ultimatevirus.getInstance().checkInfection(p.getName()) ){
+                if( Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) ){
                     Ultimatevirus.getInstance().setHealthy(p);
                 } else {
                     p.sendMessage("§cYou can't drink this, you are not infected!");
@@ -54,7 +58,7 @@ public class PlayerEvents implements Listener {
     public void onPlayerMove(PlayerMoveEvent e){
         Player p = e.getPlayer();
 
-        if(Ultimatevirus.getInstance().getConfig().getBoolean(p.getName())){
+        if(Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName())){
             Random rand = new Random();
             float result = rand.nextFloat();
             if(result <= 2){

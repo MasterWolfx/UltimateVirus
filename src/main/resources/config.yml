@@ -14,5 +14,10 @@ InfectionSpreadDelay: 10
 # The chance that a player has of catching a virus (from 0(%) to 100(%))
 InfectionPercentage: 40
 
+# Every time a player avoid a virus some "OnlinePoints" are added to his stats,
+# the more OnlinePoints he has the more chance he has of catching a virus.
+# NOTE: these points are reset when a player catches a virus.
+OnlinePointsAddition: 5
+
 # Should a player receive a message when the mask saves him from a virus?
 MsgOnMaskHit: false

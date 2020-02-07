@@ -1,12 +1,11 @@
 package techwolfx.ultimatevirus.database;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
-
 import org.bukkit.entity.Player;
-
 import techwolfx.ultimatevirus.Ultimatevirus;
 
 public abstract class Database {
@@ -66,44 +65,14 @@ public abstract class Database {
         return 0;
     }
 
-    // Exact same method here, Except as mentioned above i am looking for total!
-    public boolean isInfected(String string) {
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        try {
-            conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '"+string+"';");
 
-            rs = ps.executeQuery();
-            while(rs.next()){
-                if(rs.getString("player").equalsIgnoreCase(string.toLowerCase())){
-                    return intToBool(rs.getInt("infected"));
-                }
-            }
-        } catch (SQLException ex) {
-            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
-        } finally {
-            try {
-                if (ps != null)
-                    ps.close();
-                if (conn != null)
-                    conn.close();
-            } catch (SQLException ex) {
-                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
-            }
-        }
-        return false;
-    }
-
-    // Now we need methods to save things to the database
     public void setTokens(Player player, Boolean infected, Integer points) {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
             ps = conn.prepareStatement("REPLACE INTO " + table + " (player, infected, online_points) VALUES(?, ?, ?)"); // IMPORTANT. In SQLite class, We made 3 colums. player, Kills, Total.
-            ps.setString(1, player.getName().toLowerCase());                                             // YOU MUST put these into this line!! And depending on how many
+            ps.setString(1, player.getName());                                                               // YOU MUST put these into this line!! And depending on how many
             // colums you put (say you made 5) All 5 need to be in the brackets
             // Seperated with comma's (,) AND there needs to be the same amount of
             // question marks in the VALUES brackets. Right now i only have 3 colums
@@ -130,13 +99,153 @@ public abstract class Database {
         }
         return;
     }
+    public boolean isPlayerRegistered(String player){
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '"+player+"';");
 
-    private int boolToInt(boolean x){
-        return x ? 1 : 0;
+            rs = ps.executeQuery();
+            while(rs.next()){
+                if(rs.getString("player").equals(player)){ // Tell database to search for the player you sent into the method. e.g getTokens(sam) It will look for sam.
+                    return true; // Return the players amount of kills. If you wanted to get total (just a random number for an example for you guys) You would change this to total!
+                }
+            }
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return false;
     }
-    private boolean intToBool(int x){
-        return x==0;
+
+    public void setInfected(Player player, boolean infected) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            /*
+            UPDATE table
+            SET infected = 1,
+            column_2 = new_value_2
+            WHERE
+            player = player
+             */
+
+            ps = conn.prepareStatement("UPDATE " + table + " SET infected = '" + boolToInt(infected) + "' WHERE player = '" + player.getName() + "';");
+            ps.executeUpdate();
+            return;
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return;
     }
+    public boolean isInfected(String pName) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '" + pName + "';");
+
+            rs = ps.executeQuery();
+            while(rs.next()){
+                if(rs.getString("player").equalsIgnoreCase(pName)){
+                    return intToBool(rs.getInt("infected"));
+                }
+            }
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return false;
+    }
+
+    public void setPoints(Player player, int points) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = getSQLConnection();
+            /*
+            UPDATE table
+            SET infected = 1,
+            column_2 = new_value_2
+            WHERE
+            player = player
+             */
+
+            ps = conn.prepareStatement("UPDATE " + table + " SET online_points = '" + points + "' WHERE player = '" + player.getName() + "';");
+            ps.executeUpdate();
+            return;
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return;
+    }
+    public int getPoints(Player player) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '" + player.getName() + "';");
+
+            rs = ps.executeQuery();
+            while(rs.next()){
+                if(rs.getString("player").equals(player.getName())){
+                    return rs.getInt("online_points");
+                }
+            }
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return 0;
+    }
+
 
     public void close(PreparedStatement ps,ResultSet rs){
         try {
@@ -147,5 +256,12 @@ public abstract class Database {
         } catch (SQLException ex) {
             Error.close(plugin, ex);
         }
+    }
+
+    private int boolToInt(boolean x){
+        return x ? 1 : 0;
+    }
+    private boolean intToBool(int x){
+        return x==1;
     }
 }

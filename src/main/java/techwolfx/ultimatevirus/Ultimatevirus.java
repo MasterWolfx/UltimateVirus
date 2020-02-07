@@ -16,16 +16,11 @@ import techwolfx.ultimatevirus.commands.ReloadCMD;
 import techwolfx.ultimatevirus.commands.VaxinCMD;
 import techwolfx.ultimatevirus.database.Database;
 import techwolfx.ultimatevirus.database.SQLite;
-import techwolfx.ultimatevirus.files.InfectedList;
 import techwolfx.ultimatevirus.files.Language;
 import techwolfx.ultimatevirus.listeners.PlayerEvents;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public final class Ultimatevirus extends JavaPlugin {
 
@@ -41,12 +36,6 @@ public final class Ultimatevirus extends JavaPlugin {
     }
     public Database getRDatabase() {
         return this.db;
-    }
-
-    private void infectedListSetup(){
-        InfectedList.setup();
-        InfectedList.get().options().copyDefaults(true);
-        InfectedList.save();
     }
 
     private void langFileSetup(){
@@ -78,9 +67,6 @@ public final class Ultimatevirus extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        // infectedList.yml Setup
-        infectedListSetup();
-
         // lang.yml Setup
         langFileSetup();
 
@@ -96,28 +82,23 @@ public final class Ultimatevirus extends JavaPlugin {
     }
 
     public void setInfected(Player p){
+        getRDatabase().setPoints(p, 0);
+        getRDatabase().setInfected(p, true);
         p.sendTitle(getLangMsg("TitleOnInfection"), getLangMsg("SubtitleOnInfection"));
-        for(int i = 0 ; i < 5 ;i++){
-            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY()+2, p.getLocation().getZ()), Effect.MAGIC_CRIT, 50, 5);
-        }
         p.getPlayer().setMaxHealth(2);
-        InfectedList.get().set(p.getName(), true);
-        InfectedList.save();
+        for(int i = 0 ; i < 5 ;i++) {
+            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY() + 2, p.getLocation().getZ()), Effect.MAGIC_CRIT, 50, 5);
+        }
     }
 
     public void setHealthy(Player p){
+        getRDatabase().setInfected(p, false);
         p.sendMessage(getLangMsg("MsgOnRecover"));
+        p.removePotionEffect(PotionEffectType.CONFUSION);
+        p.setMaxHealth(20);
         for(int i = 0 ; i < 5 ; i++){
             p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY()+2, p.getLocation().getZ()), Effect.HAPPY_VILLAGER, 50, 5);
         }
-        p.removePotionEffect(PotionEffectType.CONFUSION);
-        p.setMaxHealth(20);
-        InfectedList.get().set(p.getName(), false);
-        InfectedList.save();
-    }
-
-    public boolean checkInfection(String pName){
-        return InfectedList.get().getBoolean(pName);
     }
 
     private void mainProcess(){
@@ -140,7 +121,7 @@ public final class Ultimatevirus extends JavaPlugin {
                     Bukkit.getConsoleSender().sendMessage("This player is op: " + pickedPlayerName);
                 return;
             }
-            if(checkInfection(pickedPlayerName)){
+            if(getRDatabase().isInfected(pickedPlayerName)){
                 if(debug)
                     Bukkit.getConsoleSender().sendMessage("Player already infected: " + pickedPlayerName);
                 return;
@@ -157,7 +138,7 @@ public final class Ultimatevirus extends JavaPlugin {
             if(debug)
                 Bukkit.getConsoleSender().sendMessage("RANDOM NUMBER: " + result);
 
-            if(result <= infectionProb){
+            if(result <= infectionProb + getRDatabase().getPoints(p)){
                 // Look for a mask inside player inventory
                 for(int i = 0 ; i < inv.getSize() ; i++){
                     if(debug)
@@ -187,6 +168,11 @@ public final class Ultimatevirus extends JavaPlugin {
                     setInfected(p);
                 }
             } else {
+                int pointsAddition = getConfig().getInt("OnlinePointsAddition");
+                if(getRDatabase().getPoints(p) + infectionProb + pointsAddition < 100){
+                    getRDatabase().setPoints(p, getRDatabase().getPoints(p) + pointsAddition);
+                }
+
                 if(debug)
                     Bukkit.getConsoleSender().sendMessage("Virus avoided, skipping item check");
             }
