@@ -32,6 +32,7 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         Ultimatevirus.getInstance().getPlayersOnline().remove(e.getPlayer().getName());
+
         if(Ultimatevirus.getInstance().getConfig().getBoolean("Debug"))
         Bukkit.getConsoleSender().sendMessage("Current List (Quit): " + Ultimatevirus.getInstance().getPlayersOnline());
     }
@@ -47,7 +48,7 @@ public class PlayerEvents implements Listener {
                 if( Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) ){
                     Ultimatevirus.getInstance().setHealthy(p);
                 } else {
-                    p.sendMessage("§cYou can't drink this, you are not infected!");
+                    p.sendMessage(Ultimatevirus.getInstance().getLangMsg("ErrorMsgDrinkVaxin"));
                     e.setCancelled(true);
                 }
             }

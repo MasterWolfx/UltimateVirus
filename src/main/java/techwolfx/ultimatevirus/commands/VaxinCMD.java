@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class VaxinCMD implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
         if(sender instanceof Player){
             Player p = (Player) sender;
             if(p.hasPermission("ultimatevirus.vaxin")){
@@ -62,9 +63,8 @@ public class VaxinCMD implements CommandExecutor {
         lore.add("&b&oYou can drink this vaxin ".replace("&", "§"));
         lore.add("&b&oonly if u are infected.".replace("&", "§"));
         im.setLore(lore);
-
         vaxin.setItemMeta(im);
         inv.addItem(vaxin);
-        p.sendMessage("§bYou were given a Vaxin.");
+        p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnGiveVaxin"));
     }
 }

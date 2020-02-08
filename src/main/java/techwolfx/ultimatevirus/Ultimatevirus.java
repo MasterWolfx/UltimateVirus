@@ -42,13 +42,22 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.setup();
         Language.get().addDefault("TitleOnInfection", "&2&nYou got a Virus!");
         Language.get().addDefault("SubtitleOnInfection", "&fFind a Vaxin to restore your Health");
+
         Language.get().addDefault("TitleOnLowMaskHealth", "&c&nWarning");
         Language.get().addDefault("SubtitleOnLowMaskHealth", "&fLow mask durability (%hp% HP)");
+
         Language.get().addDefault("TitleOnMaskBreak", "&c&nWarning");
         Language.get().addDefault("SubtitleOnMaskBreak", "&4Mask broken!");
-        Language.get().addDefault("MsgOnRecover", "&aYou recovered yourself from the virus!");
+
+        Language.get().addDefault("MsgOnGiveMask", "&2You were given an AntiVirus Mask.");
+        Language.get().addDefault("MsgOnGiveVaxin", "&bYou were given a Vaxin.");
+
         Language.get().addDefault("MsgOnMaskHit", "&a&l(!) &aYour mask saved you from a virus!");
-        Language.get().addDefault("MsgOn", "&a&l(!) &aYour mask saved you from a virus!");
+        Language.get().addDefault("MsgOnRecover", "&aYou recovered yourself from the virus!");
+        Language.get().addDefault("MsgCheckVirus", "&cInfected: &f%result%");
+        Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
+
+
         Language.get().options().copyDefaults(true);
         Language.save();
     }
@@ -118,7 +127,7 @@ public final class Ultimatevirus extends JavaPlugin {
             // Check if the picked player has the bypass permission
             if(Bukkit.getPlayer(pickedPlayerName).hasPermission("ultimatevirus.bypass")){
                 if(debug)
-                    Bukkit.getConsoleSender().sendMessage("This player is op: " + pickedPlayerName);
+                    Bukkit.getConsoleSender().sendMessage("This player has the bypass permission: " + pickedPlayerName);
                 return;
             }
             if(getRDatabase().isInfected(pickedPlayerName)){
@@ -134,19 +143,19 @@ public final class Ultimatevirus extends JavaPlugin {
             int infectionProb = getConfig().getInt("InfectionPercentage");
             int result = rand.nextInt(100);
             boolean msgOnMaskHit = getConfig().getBoolean("MsgOnMaskHit");
-            boolean canInfectPlayer = true;
+
             if(debug)
                 Bukkit.getConsoleSender().sendMessage("RANDOM NUMBER: " + result);
 
             if(result <= infectionProb + getRDatabase().getPoints(p)){
-                // Look for a mask inside player inventory
+                // Look for a mask inside player inventory: if mask is found, return
                 for(int i = 0 ; i < inv.getSize() ; i++){
                     if(debug)
                         Bukkit.getConsoleSender().sendMessage("Checking item " + i);
                     ItemStack item = inv.getItem(i);
                     if(item != null){
-                        // If found mask canInfectPlayer = false
                         if(item.getType() == Material.LEATHER_HELMET && item.getItemMeta().getDisplayName().equals(maskName.replace("&", "§"))){
+                            // Checking mask durability: if it is negative, destroy it
                             if(item.getDurability() < item.getType().getMaxDurability()-1){
                                 item.setDurability((short)(item.getDurability()+ 1));
                                 if(item.getDurability() > item.getType().getMaxDurability()-5){
@@ -159,15 +168,13 @@ public final class Ultimatevirus extends JavaPlugin {
                             if(msgOnMaskHit){
                                 p.sendMessage(getLangMsg("MsgOnMaskHit"));
                             }
-                            canInfectPlayer = false;
-                            break;
+                            return;
                         }
                     }
                 }
-                if(canInfectPlayer){
-                    setInfected(p);
-                }
+                setInfected(p);
             } else {
+                // The player avoided the virus, adding online points to his stats
                 int pointsAddition = getConfig().getInt("OnlinePointsAddition");
                 if(getRDatabase().getPoints(p) + infectionProb + pointsAddition < 100){
                     getRDatabase().setPoints(p, getRDatabase().getPoints(p) + pointsAddition);

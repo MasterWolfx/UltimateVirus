@@ -1,6 +1,7 @@
 package techwolfx.ultimatevirus.commands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,6 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class MaskCMD implements CommandExecutor {
@@ -63,9 +66,8 @@ public class MaskCMD implements CommandExecutor {
         lore.add("&2&oYou must keep this mask ".replace("&", "§"));
         lore.add("&2&oin your inventory.".replace("&", "§"));
         im.setLore(lore);
-
         mask.setItemMeta(im);
         inv.addItem(mask);
-        p.sendMessage("§2You were given an AntiVirus Mask.");
+        p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnGiveMask"));
     }
 }
