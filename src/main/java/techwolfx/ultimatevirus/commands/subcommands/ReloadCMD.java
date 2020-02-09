@@ -1,5 +1,6 @@
 package techwolfx.ultimatevirus.commands.subcommands;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
@@ -23,13 +24,17 @@ public class ReloadCMD extends SubCommand {
     }
 
     @Override
-    public void perform(Player p, String[] args) {
-        if(!p.hasPermission("ultimatevirus.reload")){
-            noPermission(p);
-            return;
+    public void perform(CommandSender sender, String[] args) {
+        if(sender instanceof Player){
+            Player p = (Player) sender;
+            if(!p.hasPermission("ultimatevirus.reload")){
+                noPermission(p);
+                return;
+            }
         }
+
         Ultimatevirus.getInstance().reloadConfig();
         Language.reload();
-        p.sendMessage("§aUltimateVirus reloaded correctly.");
+        sender.sendMessage("§aUltimateVirus config reloaded.");
     }
 }

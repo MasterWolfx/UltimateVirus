@@ -2,6 +2,7 @@ package techwolfx.ultimatevirus.commands.subcommands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -55,24 +56,32 @@ public class MaskCMD extends SubCommand {
     }
 
     @Override
-    public void perform(Player p, String[] args) {
-        if(!p.hasPermission("ultimatevirus.mask")){
-            noPermission(p);
-            return;
+    public void perform(CommandSender sender, String[] args) {
+        if(sender instanceof Player){
+            Player p = (Player) sender;
+            if(!p.hasPermission("ultimatevirus.mask")){
+                noPermission(p);
+                return;
+            }
         }
         switch (args.length){
             case 1:
-                giveMask(p);
+                if(sender instanceof Player){
+                    Player p = (Player) sender;
+                    giveMask(p);
+                } else {
+                    sender.sendMessage("§cThis command can only be executed by a player.");
+                }
                 break;
             case 2:
                 try{
                     giveMask(Bukkit.getPlayer(args[1]));
                 } catch (Exception ex){
-                    p.sendMessage("§cCan't find that player.");
+                    sender.sendMessage("§cCan't find that player.");
                 }
                 break;
             default:
-                invalidArgs(p);
+                invalidArgs(sender);
                 break;
         }
     }

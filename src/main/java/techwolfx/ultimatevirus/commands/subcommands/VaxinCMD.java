@@ -2,8 +2,8 @@ package techwolfx.ultimatevirus.commands.subcommands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -34,7 +34,7 @@ public class VaxinCMD extends SubCommand {
         return vaxin;
     }
 
-    private void createVaxin(Player p){
+    private void giveVaxin(Player p){
         Inventory inv = p.getInventory();
 
         inv.addItem(getVaxin());
@@ -57,24 +57,32 @@ public class VaxinCMD extends SubCommand {
     }
 
     @Override
-    public void perform(Player p, String[] args) {
-        if(!p.hasPermission("ultimatevirus.vaxin")){
-            noPermission(p);
-            return;
+    public void perform(CommandSender sender, String[] args) {
+        if(sender instanceof Player){
+            Player p = (Player) sender;
+            if(!p.hasPermission("ultimatevirus.vaxin")){
+                noPermission(p);
+                return;
+            }
         }
         switch (args.length){
             case 1:
-                createVaxin(p);
+                if(sender instanceof Player){
+                    Player p = (Player) sender;
+                    giveVaxin(p);
+                } else {
+                    sender.sendMessage("§cThis command can only be executed by a player.");
+                }
                 break;
             case 2:
                 try{
-                    createVaxin(Bukkit.getPlayer(args[1]));
+                    giveVaxin(Bukkit.getPlayer(args[1]));
                 } catch (Exception ex){
-                    p.sendMessage("§cCan't find that player.");
+                    sender.sendMessage("§cCan't find that player.");
                 }
                 break;
             default:
-                invalidArgs(p);
+                invalidArgs(sender);
                 break;
         }
     }

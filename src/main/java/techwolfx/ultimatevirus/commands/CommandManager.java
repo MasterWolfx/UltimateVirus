@@ -27,27 +27,24 @@ public class CommandManager implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(sender instanceof Player){
-            Player p = (Player) sender;
+        // If the command does not comprise a subcommand or if the subcommand is help
+        if(args.length == 0 || args[0].equalsIgnoreCase("help")){
+            sender.sendMessage("§8§m---------------§a§o UltimateVirus §8§m---------------");
+            for(SubCommand cmd : subCommands){
+                sender.sendMessage("§a" + cmd.getSyntax() + " §8| §7" + cmd.getDesc());
+            }
+            return false;
+        }
 
-            // If the command does not comprise a subcommand or if the subcommand is help
-            if(args.length == 0 || args[0].equalsIgnoreCase("help")){
-                p.sendMessage("§8§m---------------§a§o UltimateVirus §8§m---------------");
-                for(SubCommand cmd : subCommands){
-                    p.sendMessage("§a" + cmd.getSyntax() + " §8| §7" + cmd.getDesc());
-                }
+        // Checking if the subcommand exists
+        for(int i = 0 ; i < getSubCommands().size() ; i++){
+            if(args[0].equalsIgnoreCase(getSubCommands().get(i).getName())){
+                getSubCommands().get(i).perform(sender, args);
                 return false;
             }
-
-            // Checking if the subcommand exists
-            for(int i = 0 ; i < getSubCommands().size() ; i++){
-                if(args[0].equalsIgnoreCase(getSubCommands().get(i).getName())){
-                    getSubCommands().get(i).perform(p, args);
-                    return false;
-                }
-            }
-            p.sendMessage("§cSubcommand not found. View all the commands typing: /virus help");
         }
+        sender.sendMessage("§cSubcommand not found. View all the commands typing: /virus help");
+
         return false;
     }
 

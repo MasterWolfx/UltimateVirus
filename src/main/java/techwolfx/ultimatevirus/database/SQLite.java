@@ -7,7 +7,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
-
 import techwolfx.ultimatevirus.database.Database; // import the database class.
 import techwolfx.ultimatevirus.Ultimatevirus;
 
@@ -38,7 +37,7 @@ public class SQLite extends Database{
             }
         }
         try {
-            if(connection!=null&&!connection.isClosed()){
+            if(connection!=null && !connection.isClosed()){
                 return connection;
             }
             Class.forName("org.sqlite.JDBC");

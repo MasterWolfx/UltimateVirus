@@ -20,5 +20,11 @@ InfectionPercentage: 40
 # NOTE: these points are reset when a player catches a virus.
 OnlinePointsAddition: 5
 
+# Note: to apply recipes changes you must reload/restart the server
+EnableMaskRecipe: true
+EnableVaxinRecipe: true
+
 # Should a player receive a message when the mask saves him from a virus?
 MsgOnMaskHit: false
+
+

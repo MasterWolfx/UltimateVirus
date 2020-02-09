@@ -25,7 +25,7 @@ public abstract class Database {
     public void initialize(){
         connection = getSQLConnection();
         try{
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM " + table + " WHERE player = ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM " + table);
             ResultSet rs = ps.executeQuery();
             close(ps,rs);
 
@@ -34,7 +34,7 @@ public abstract class Database {
         }
     }
 
-    public void close(PreparedStatement ps,ResultSet rs){
+    public void close(PreparedStatement ps, ResultSet rs){
         try {
             if (ps != null)
                 ps.close();

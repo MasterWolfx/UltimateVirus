@@ -57,6 +57,7 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.get().addDefault("MsgOnMaskHit", "&a&l(!) &aYour mask saved you from a virus!");
         Language.get().addDefault("MsgOnRecover", "&aYou recovered yourself from the virus!");
         Language.get().addDefault("MsgCheckVirus", "&cInfected: &f%result%");
+        Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%result%");
         Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
 
 
@@ -77,11 +78,16 @@ public final class Ultimatevirus extends JavaPlugin {
 
         // lang.yml Setup
         langFileSetup();
-        maskRecipe();
-        vaxinRecipe();
+
+        // Enable custom recipes
+        if(getConfig().getBoolean("EnableMaskRecipe"))
+            maskRecipe();
+        if(getConfig().getBoolean("EnableVaxinRecipe"))
+            vaxinRecipe();
 
         this.db = new SQLite(this);
         this.db.load();
+
         Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Plugin Enabled.");
 
         BukkitScheduler scheduler = getServer().getScheduler();
@@ -120,6 +126,7 @@ public final class Ultimatevirus extends JavaPlugin {
 
         getServer().addRecipe(vaxinRecipe);
     }
+
     public void setInfected(Player p){
         getRDatabase().setPoints(p, 0);
         getRDatabase().setInfected(p, true);
