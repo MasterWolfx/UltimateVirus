@@ -15,8 +15,7 @@ import java.util.ArrayList;
 
 public class MaskCMD extends SubCommand {
 
-    private void createMask(Player p){
-        Inventory inv = p.getInventory();
+    public static ItemStack getMask(){
         String maskName = Ultimatevirus.getInstance().getConfig().getString("MaskDisplayName").replace("&", "§");
 
         ItemStack mask = new ItemStack(Material.LEATHER_HELMET, 1);
@@ -31,7 +30,12 @@ public class MaskCMD extends SubCommand {
         lore.add("&2&oin your inventory.".replace("&", "§"));
         im.setLore(lore);
         mask.setItemMeta(im);
-        inv.addItem(mask);
+        return mask;
+    }
+
+    private void giveMask(Player p){
+        Inventory inv = p.getInventory();
+        inv.addItem(getMask());
         p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnGiveMask"));
     }
 
@@ -58,11 +62,11 @@ public class MaskCMD extends SubCommand {
         }
         switch (args.length){
             case 1:
-                createMask(p);
+                giveMask(p);
                 break;
             case 2:
                 try{
-                    createMask(Bukkit.getPlayer(args[1]));
+                    giveMask(Bukkit.getPlayer(args[1]));
                 } catch (Exception ex){
                     p.sendMessage("§cCan't find that player.");
                 }

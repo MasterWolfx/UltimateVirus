@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -76,6 +77,8 @@ public final class Ultimatevirus extends JavaPlugin {
 
         // lang.yml Setup
         langFileSetup();
+        maskRecipe();
+        vaxinRecipe();
 
         this.db = new SQLite(this);
         this.db.load();
@@ -88,6 +91,35 @@ public final class Ultimatevirus extends JavaPlugin {
 
     }
 
+    public void maskRecipe(){
+        ItemStack maskItem = MaskCMD.getMask();
+
+        ShapedRecipe maskRecipe = new ShapedRecipe(maskItem);
+
+        maskRecipe.shape("***","%%%","LLL");
+
+        maskRecipe.setIngredient('*', Material.STRING);
+        maskRecipe.setIngredient('%', Material.PAPER);
+        maskRecipe.setIngredient('L', Material.LEATHER);
+
+        getServer().addRecipe(maskRecipe);
+    }
+    public void vaxinRecipe(){
+        ItemStack vaxinItem = VaxinCMD.getVaxin();
+
+        ShapedRecipe vaxinRecipe = new ShapedRecipe(vaxinItem);
+
+        vaxinRecipe.shape("ESW","SPS","RSB");
+
+        vaxinRecipe.setIngredient('P', Material.POTION);
+        vaxinRecipe.setIngredient('E', Material.FERMENTED_SPIDER_EYE);
+        vaxinRecipe.setIngredient('S', Material.SUGAR);
+        vaxinRecipe.setIngredient('B', Material.BROWN_MUSHROOM);
+        vaxinRecipe.setIngredient('R', Material.RED_MUSHROOM);
+        vaxinRecipe.setIngredient('W', Material.EGG);
+
+        getServer().addRecipe(vaxinRecipe);
+    }
     public void setInfected(Player p){
         getRDatabase().setPoints(p, 0);
         getRDatabase().setInfected(p, true);

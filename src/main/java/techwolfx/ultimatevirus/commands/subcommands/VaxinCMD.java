@@ -3,6 +3,7 @@ package techwolfx.ultimatevirus.commands.subcommands;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -15,8 +16,7 @@ import java.util.ArrayList;
 
 public class VaxinCMD extends SubCommand {
 
-    private void createVaxin(Player p){
-        Inventory inv = p.getInventory();
+    public static ItemStack getVaxin(){
         String vaxinName = Ultimatevirus.getInstance().getConfig().getString("VaxinDisplayName").replace("&", "§");
 
         ItemStack vaxin = new ItemStack(Material.POTION, 1);
@@ -31,7 +31,13 @@ public class VaxinCMD extends SubCommand {
         lore.add("&b&oonly if u are infected.".replace("&", "§"));
         im.setLore(lore);
         vaxin.setItemMeta(im);
-        inv.addItem(vaxin);
+        return vaxin;
+    }
+
+    private void createVaxin(Player p){
+        Inventory inv = p.getInventory();
+
+        inv.addItem(getVaxin());
         p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnGiveVaxin"));
     }
 
