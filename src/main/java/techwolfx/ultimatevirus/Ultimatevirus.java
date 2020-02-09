@@ -10,10 +10,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import techwolfx.ultimatevirus.commands.CheckInfectionCMD;
-import techwolfx.ultimatevirus.commands.MaskCMD;
-import techwolfx.ultimatevirus.commands.ReloadCMD;
-import techwolfx.ultimatevirus.commands.VaxinCMD;
+import techwolfx.ultimatevirus.commands.CommandManager;
+import techwolfx.ultimatevirus.commands.subcommands.CheckInfectionCMD;
+import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
+import techwolfx.ultimatevirus.commands.subcommands.ReloadCMD;
+import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
 import techwolfx.ultimatevirus.database.Database;
 import techwolfx.ultimatevirus.database.SQLite;
 import techwolfx.ultimatevirus.files.Language;
@@ -69,10 +70,7 @@ public final class Ultimatevirus extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
-        Objects.requireNonNull(getCommand("mask")).setExecutor(new MaskCMD());
-        Objects.requireNonNull(getCommand("vaxin")).setExecutor(new VaxinCMD());
-        Objects.requireNonNull(getCommand("virusreload")).setExecutor(new ReloadCMD());
-        Objects.requireNonNull(getCommand("checkvirus")).setExecutor(new CheckInfectionCMD());
+        Objects.requireNonNull(getCommand("virus")).setExecutor(new CommandManager());
         instance = this;
         saveDefaultConfig();
 
@@ -176,7 +174,7 @@ public final class Ultimatevirus extends JavaPlugin {
             } else {
                 // The player avoided the virus, adding online points to his stats
                 int pointsAddition = getConfig().getInt("OnlinePointsAddition");
-                if(getRDatabase().getPoints(p) + infectionProb + pointsAddition < 100){
+                if(getRDatabase().getPoints(p) + infectionProb + pointsAddition <= 100){
                     getRDatabase().setPoints(p, getRDatabase().getPoints(p) + pointsAddition);
                 }
 
