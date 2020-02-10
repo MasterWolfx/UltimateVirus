@@ -3,14 +3,10 @@ package techwolfx.ultimatevirus.commands;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import techwolfx.ultimatevirus.commands.subcommands.CheckInfectionCMD;
-import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
-import techwolfx.ultimatevirus.commands.subcommands.ReloadCMD;
-import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
+import techwolfx.ultimatevirus.commands.subcommands.*;
 
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class CommandManager implements CommandExecutor {
 
@@ -22,6 +18,8 @@ public class CommandManager implements CommandExecutor {
         subCommands.add(new MaskCMD());
         subCommands.add(new VaxinCMD());
         subCommands.add(new CheckInfectionCMD());
+        subCommands.add(new InfectCMD());
+        subCommands.add(new RecoverCMD());
     }
 
     @Override

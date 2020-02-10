@@ -38,14 +38,14 @@ public class CheckInfectionCMD extends SubCommand {
                 if(sender instanceof Player){
                     Player p = (Player) sender;
                     if(!p.hasPermission("ultimatevirus.checkothers")){
-                        noPermission(p);
+                        invalidPermission(p);
                         break;
                     }
                 }
                 try{
                     sender.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgCheckVirusOthers").replace("%result%", Ultimatevirus.getInstance().getRDatabase().isInfected(args[1]) ? "true" : "false").replace("%target%", args[1]));
                 } catch (Exception ex){
-                    sender.sendMessage("§cCan't find that player.");
+                    invalidPlayer(sender);
                 }
                 break;
             default:

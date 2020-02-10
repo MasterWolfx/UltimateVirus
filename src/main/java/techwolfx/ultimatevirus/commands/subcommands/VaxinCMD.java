@@ -61,7 +61,7 @@ public class VaxinCMD extends SubCommand {
         if(sender instanceof Player){
             Player p = (Player) sender;
             if(!p.hasPermission("ultimatevirus.vaxin")){
-                noPermission(p);
+                invalidPermission(p);
                 return;
             }
         }
@@ -78,7 +78,7 @@ public class VaxinCMD extends SubCommand {
                 try{
                     giveVaxin(Bukkit.getPlayer(args[1]));
                 } catch (Exception ex){
-                    sender.sendMessage("§cCan't find that player.");
+                    invalidPlayer(sender);
                 }
                 break;
             default:

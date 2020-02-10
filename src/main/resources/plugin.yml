@@ -1,9 +1,8 @@
 name: Ultimatevirus
 version: ${project.version}
 main: techwolfx.ultimatevirus.Ultimatevirus
-api-version: 1.13
 authors: [MasterWolfx]
-description: Create a virus inside your server.
+description: Add a virus in your server.
 commands:
   virus:
     description: Display all the plugin commands.

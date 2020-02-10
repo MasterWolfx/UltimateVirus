@@ -60,7 +60,7 @@ public class MaskCMD extends SubCommand {
         if(sender instanceof Player){
             Player p = (Player) sender;
             if(!p.hasPermission("ultimatevirus.mask")){
-                noPermission(p);
+                invalidPermission(p);
                 return;
             }
         }
@@ -77,7 +77,7 @@ public class MaskCMD extends SubCommand {
                 try{
                     giveMask(Bukkit.getPlayer(args[1]));
                 } catch (Exception ex){
-                    sender.sendMessage("§cCan't find that player.");
+                    invalidPlayer(sender);
                 }
                 break;
             default:

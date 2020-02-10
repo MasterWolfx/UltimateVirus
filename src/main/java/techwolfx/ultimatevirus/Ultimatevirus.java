@@ -12,9 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import techwolfx.ultimatevirus.commands.CommandManager;
-import techwolfx.ultimatevirus.commands.subcommands.CheckInfectionCMD;
 import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
-import techwolfx.ultimatevirus.commands.subcommands.ReloadCMD;
 import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
 import techwolfx.ultimatevirus.database.Database;
 import techwolfx.ultimatevirus.database.SQLite;
@@ -24,22 +22,28 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
+
 public final class Ultimatevirus extends JavaPlugin {
 
+    // Players Online List
     private ArrayList<String> playersOnline = new ArrayList<>();
-    private static Ultimatevirus instance;
-    private Database db;
-
     public ArrayList<String> getPlayersOnline(){
         return playersOnline;
     }
+
+    // Ultimatevirs instance
+    private static Ultimatevirus instance;
     public static Ultimatevirus getInstance(){
         return instance;
     }
+
+    // SQLite Database
+    private Database db;
     public Database getRDatabase() {
         return this.db;
     }
 
+    // lang.yml
     private void langFileSetup(){
         Language.setup();
         Language.get().addDefault("TitleOnInfection", "&2&nYou got a Virus!");
@@ -64,11 +68,11 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.get().options().copyDefaults(true);
         Language.save();
     }
-
     public String getLangMsg(String s){
         return Language.get().getString(s).replace("&", "§");
     }
 
+    // Enable the plugin
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
@@ -76,15 +80,16 @@ public final class Ultimatevirus extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
 
-        // lang.yml Setup
+        // Creating lang.yml
         langFileSetup();
 
-        // Enable custom recipes
+        // Enabling custom recipes
         if(getConfig().getBoolean("EnableMaskRecipe"))
             maskRecipe();
         if(getConfig().getBoolean("EnableVaxinRecipe"))
             vaxinRecipe();
 
+        // Enabling database
         this.db = new SQLite(this);
         this.db.load();
 
@@ -95,56 +100,6 @@ public final class Ultimatevirus extends JavaPlugin {
 
         scheduler.scheduleSyncRepeatingTask(this, this::mainProcess, 0L, checkInterval *20);
 
-    }
-
-    public void maskRecipe(){
-        ItemStack maskItem = MaskCMD.getMask();
-
-        ShapedRecipe maskRecipe = new ShapedRecipe(maskItem);
-
-        maskRecipe.shape("***","%%%","LLL");
-
-        maskRecipe.setIngredient('*', Material.STRING);
-        maskRecipe.setIngredient('%', Material.PAPER);
-        maskRecipe.setIngredient('L', Material.LEATHER);
-
-        getServer().addRecipe(maskRecipe);
-    }
-    public void vaxinRecipe(){
-        ItemStack vaxinItem = VaxinCMD.getVaxin();
-
-        ShapedRecipe vaxinRecipe = new ShapedRecipe(vaxinItem);
-
-        vaxinRecipe.shape("ESW","SPS","RSB");
-
-        vaxinRecipe.setIngredient('P', Material.POTION);
-        vaxinRecipe.setIngredient('E', Material.FERMENTED_SPIDER_EYE);
-        vaxinRecipe.setIngredient('S', Material.SUGAR);
-        vaxinRecipe.setIngredient('B', Material.BROWN_MUSHROOM);
-        vaxinRecipe.setIngredient('R', Material.RED_MUSHROOM);
-        vaxinRecipe.setIngredient('W', Material.EGG);
-
-        getServer().addRecipe(vaxinRecipe);
-    }
-
-    public void setInfected(Player p){
-        getRDatabase().setPoints(p, 0);
-        getRDatabase().setInfected(p, true);
-        p.sendTitle(getLangMsg("TitleOnInfection"), getLangMsg("SubtitleOnInfection"));
-        p.getPlayer().setMaxHealth(2);
-        for(int i = 0 ; i < 5 ;i++) {
-            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY() + 2, p.getLocation().getZ()), Effect.MAGIC_CRIT, 50, 5);
-        }
-    }
-
-    public void setHealthy(Player p){
-        getRDatabase().setInfected(p, false);
-        p.sendMessage(getLangMsg("MsgOnRecover"));
-        p.removePotionEffect(PotionEffectType.CONFUSION);
-        p.setMaxHealth(20);
-        for(int i = 0 ; i < 5 ; i++){
-            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY()+2, p.getLocation().getZ()), Effect.HAPPY_VILLAGER, 50, 5);
-        }
     }
 
     private void mainProcess(){
@@ -221,5 +176,54 @@ public final class Ultimatevirus extends JavaPlugin {
                     Bukkit.getConsoleSender().sendMessage("Virus avoided, skipping item check");
             }
         } catch (Exception ignored){ }
+    }
+
+    public void maskRecipe(){
+        ItemStack maskItem = MaskCMD.getMask();
+
+        ShapedRecipe maskRecipe = new ShapedRecipe(maskItem);
+
+        maskRecipe.shape("***","%%%","LLL");
+
+        maskRecipe.setIngredient('*', Material.STRING);
+        maskRecipe.setIngredient('%', Material.PAPER);
+        maskRecipe.setIngredient('L', Material.LEATHER);
+
+        getServer().addRecipe(maskRecipe);
+    }
+    public void vaxinRecipe(){
+        ItemStack vaxinItem = VaxinCMD.getVaxin();
+
+        ShapedRecipe vaxinRecipe = new ShapedRecipe(vaxinItem);
+
+        vaxinRecipe.shape("ESW","SPS","RSB");
+
+        vaxinRecipe.setIngredient('P', Material.POTION);
+        vaxinRecipe.setIngredient('E', Material.FERMENTED_SPIDER_EYE);
+        vaxinRecipe.setIngredient('S', Material.SUGAR);
+        vaxinRecipe.setIngredient('B', Material.BROWN_MUSHROOM);
+        vaxinRecipe.setIngredient('R', Material.RED_MUSHROOM);
+        vaxinRecipe.setIngredient('W', Material.EGG);
+
+        getServer().addRecipe(vaxinRecipe);
+    }
+
+    public void setInfected(Player p){
+        getRDatabase().setPoints(p, 0);
+        getRDatabase().setInfected(p, true);
+        p.sendTitle(getLangMsg("TitleOnInfection"), getLangMsg("SubtitleOnInfection"));
+        p.getPlayer().setMaxHealth(2);
+        /*for(int i = 0 ; i < 5 ;i++) {
+            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY() + 2, p.getLocation().getZ()), Effect.MAGIC_CRIT, 50, 5);
+        }*/
+    }
+    public void setHealthy(Player p){
+        getRDatabase().setInfected(p, false);
+        p.sendMessage(getLangMsg("MsgOnRecover"));
+        p.removePotionEffect(PotionEffectType.CONFUSION);
+        p.setMaxHealth(20);
+        /*for(int i = 0 ; i < 5 ; i++){
+            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY()+2, p.getLocation().getZ()), Effect.HAPPY_VILLAGER, 50, 5);
+        }*/
     }
 }

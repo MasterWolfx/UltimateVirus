@@ -28,7 +28,7 @@ public class ReloadCMD extends SubCommand {
         if(sender instanceof Player){
             Player p = (Player) sender;
             if(!p.hasPermission("ultimatevirus.reload")){
-                noPermission(p);
+                invalidPermission(p);
                 return;
             }
         }

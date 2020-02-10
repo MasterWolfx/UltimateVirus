@@ -16,7 +16,10 @@ public abstract class SubCommand {
     public void invalidArgs(CommandSender sender){
         sender.sendMessage("§cInvalid arguments. Usage: %syntax%".replace("%syntax%", getSyntax()));
     }
-    public void noPermission(Player p){
-        p.sendMessage("§cYou don't have permission to execute this command.");
+    public void invalidPermission(Player p){
+        p.sendMessage("§cYou don't have the permission to execute this command.");
+    }
+    public void invalidPlayer(CommandSender sender){
+        sender.sendMessage("§cCan't find that player.");
     }
 }

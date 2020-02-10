@@ -1,7 +1,6 @@
 package techwolfx.ultimatevirus.listeners;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,7 +17,6 @@ import java.util.Random;
 
 public class PlayerEvents implements Listener {
 
-
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
         Ultimatevirus.getInstance().getPlayersOnline().add(e.getPlayer().getName());
@@ -26,7 +24,7 @@ public class PlayerEvents implements Listener {
             Ultimatevirus.getInstance().getRDatabase().setTokens(e.getPlayer(), false, 0);
         }
         if(Ultimatevirus.getInstance().getConfig().getBoolean("Debug"))
-        Bukkit.getConsoleSender().sendMessage("Current List (Join): " + Ultimatevirus.getInstance().getPlayersOnline());
+            Bukkit.getConsoleSender().sendMessage("Current List (Join): " + Ultimatevirus.getInstance().getPlayersOnline());
     }
 
     @EventHandler
@@ -34,7 +32,7 @@ public class PlayerEvents implements Listener {
         Ultimatevirus.getInstance().getPlayersOnline().remove(e.getPlayer().getName());
 
         if(Ultimatevirus.getInstance().getConfig().getBoolean("Debug"))
-        Bukkit.getConsoleSender().sendMessage("Current List (Quit): " + Ultimatevirus.getInstance().getPlayersOnline());
+            Bukkit.getConsoleSender().sendMessage("Current List (Quit): " + Ultimatevirus.getInstance().getPlayersOnline());
     }
 
     @EventHandler
@@ -60,11 +58,45 @@ public class PlayerEvents implements Listener {
         Player p = e.getPlayer();
 
         if(Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName())){
-            Random rand = new Random();
-            float result = rand.nextFloat();
-            if(result <= 2){
-                p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 10*20, 2));
+            //
+            // Add potion effects to an infected player
+            //
+            if(Ultimatevirus.getInstance().getConfig().getBoolean("EnablePotionEffectsWhenInfected")){
+                Random rand = new Random();
+                float result = rand.nextFloat();
+                if(result <= 2){
+                    int time = Ultimatevirus.getInstance().getConfig().getInt("PotionEffectsDuration");
+                    for (String s: Ultimatevirus.getInstance().getConfig().getStringList("PotionEffectsWhenInfected")) {
+                        // Index 0: EffectType - Index 1: Amplifier
+                        String[] splittedEffect = s.split("#");
+
+                        PotionEffectType effect;
+                        try {
+                            effect = PotionEffectType.getByName(splittedEffect[0]);
+                        } catch (Exception ex) {
+                            Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] One of your PotionEffectsWhenInfected was not recognized :(");
+                            continue;
+                        }
+                        p.addPotionEffect(new PotionEffect(effect, time*20, Integer.parseInt(splittedEffect[1])-1));
+                    }
+                }
+            }
+            //
+            // Generate particles when an infected player moves
+            //
+            if(Ultimatevirus.getInstance().getConfig().getBoolean("ParticlesWhenInfected")){
+
+                if(Bukkit.getBukkitVersion().contains("1.8")){
+                    Effect particle = Effect.valueOf(Ultimatevirus.getInstance().getConfig().getString("InfectionParticleType"));
+                    p.getWorld().playEffect(p.getLocation(), particle, 50, 5);
+
+                    // Editable player location: new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())
+                } else {
+                    Particle particle = Particle.valueOf(Ultimatevirus.getInstance().getConfig().getString("InfectionParticleType"));
+                    p.spawnParticle(particle, p.getLocation(), 5);
+                }
             }
         }
     }
+
 }

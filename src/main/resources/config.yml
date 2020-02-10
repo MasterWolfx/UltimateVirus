@@ -1,30 +1,43 @@
-# Keep this to false if you don't know what you are doing
+# Keep this to false if you don't know what you are doing.
 Debug: false
 
-# Items' display names
+# Items' display names.
 MaskDisplayName: "&2AntiVirus Mask"
 VaxinDisplayName: "&bVaxin"
 
-# Minimum number of Online Players to start the virus spreading
+# Minimum number of Online Players to start the virus spreading.
 MinOnlinePlayers: 1
 
-# The time (in seconds) between each time the virus tries to infect a random player
+# The time (in seconds) between each time the virus tries to infect a random player.
 InfectionSpreadDelay: 10
 
-# The chance that a player has of catching a virus (from 0(%) to 100(%))
+# The chance that a player has of catching a virus (from 0(%) to 100(%)).
 InfectionPercentage: 40
 
-# Every time a player avoid a virus some "OnlinePoints" are added to his stats,
-# the more OnlinePoints he has the more chance he has to catch a virus.
+# Every time a player avoids a virus some "OnlinePoints" are added to his stats,
+# the more OnlinePoints he has the more chance he has to catch a virus next time.
 # These points will be added to the InfectionPercentage.
 # NOTE: these points are reset when a player catches a virus.
 OnlinePointsAddition: 5
 
-# Note: to apply recipes changes you must reload/restart the server
+# NOTE: to apply recipes changes you must reload/restart the server.
 EnableMaskRecipe: true
 EnableVaxinRecipe: true
 
 # Should a player receive a message when the mask saves him from a virus?
 MsgOnMaskHit: false
 
+# You can find a list of ParticleTypes here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
+# NOTE: Make sure that the particles you choose are supported in your server version.
+ParticlesWhenInfected: true
+InfectionParticleType: SLIME
+
+EnablePotionEffectsWhenInfected: true
+# You can find a list of PotionEffectTypes here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
+# NOTE: Make sure that the potion effects you choose are supported in your server version.
+# Add as many effects as you wish. FORMAT: PotionEffectType#Level
+PotionEffectsWhenInfected:
+  - CONFUSION#3
+# Duration in seconds
+PotionEffectsDuration: 10
 

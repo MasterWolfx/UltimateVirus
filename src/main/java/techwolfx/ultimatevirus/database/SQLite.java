@@ -60,6 +60,6 @@ public class SQLite extends Database{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        initialize();
+        //initialize();
     }
 }

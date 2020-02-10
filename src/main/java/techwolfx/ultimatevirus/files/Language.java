@@ -7,11 +7,11 @@ import java.io.File;
 import java.io.IOException;
 
 public class Language {
+
     private static File file;
     private static FileConfiguration customFile;
 
     //Finds or generates the custom config file
-
     public static void setup(){
 
         file = new File(Bukkit.getServer().getPluginManager().getPlugin("Ultimatevirus").getDataFolder(), "lang.yml");
@@ -19,9 +19,7 @@ public class Language {
         if (!file.exists()){
             try{
                 file.createNewFile();
-            }catch (IOException e){
-                //owww
-            }
+            }catch (IOException ignored){ }
         }
         customFile = YamlConfiguration.loadConfiguration(file);
     }
