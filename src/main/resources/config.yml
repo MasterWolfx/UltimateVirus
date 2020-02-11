@@ -41,3 +41,9 @@ PotionEffectsWhenInfected:
 # Duration in seconds
 PotionEffectsDuration: 10
 
+#
+# Custom Placeholder: %ultimatevirus_isInfected%
+# You can choose the message that this placeholder returns
+#
+ReturnMsgWhenTrue: "yes"
+ReturnMsgWhenFalse: "no"

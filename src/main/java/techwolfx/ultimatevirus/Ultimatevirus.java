@@ -1,5 +1,6 @@
 package techwolfx.ultimatevirus;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -11,6 +12,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.junit.Before;
 import techwolfx.ultimatevirus.commands.CommandManager;
 import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
 import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
@@ -18,6 +20,8 @@ import techwolfx.ultimatevirus.database.Database;
 import techwolfx.ultimatevirus.database.SQLite;
 import techwolfx.ultimatevirus.files.Language;
 import techwolfx.ultimatevirus.listeners.PlayerEvents;
+import techwolfx.ultimatevirus.placeholders.CustomPlaceholder;
+
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
@@ -72,6 +76,8 @@ public final class Ultimatevirus extends JavaPlugin {
         return Language.get().getString(s).replace("&", "§");
     }
 
+
+    public CustomPlaceholder myPlaceholder;
     // Enable the plugin
     @Override
     public void onEnable() {
@@ -89,6 +95,13 @@ public final class Ultimatevirus extends JavaPlugin {
         if(getConfig().getBoolean("EnableVaxinRecipe"))
             vaxinRecipe();
 
+        // Check if PlaceholderApi is enabled, and hook it
+        if(Ultimatevirus.getInstance().getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
+            myPlaceholder = new CustomPlaceholder(this);
+        } else {
+            throw new RuntimeException("§cCould not find PlaceholderAPI!");
+        }
+
         // Enabling database
         this.db = new SQLite(this);
         this.db.load();
@@ -98,7 +111,7 @@ public final class Ultimatevirus extends JavaPlugin {
         BukkitScheduler scheduler = getServer().getScheduler();
         int checkInterval = getConfig().getInt("InfectionSpreadDelay");
 
-        scheduler.scheduleSyncRepeatingTask(this, this::mainProcess, 0L, checkInterval *20);
+        scheduler.scheduleSyncRepeatingTask(this, this::mainProcess, 0L, checkInterval*20);
 
     }
 

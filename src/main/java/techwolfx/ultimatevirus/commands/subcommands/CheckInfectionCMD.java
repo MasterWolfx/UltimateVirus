@@ -1,5 +1,7 @@
 package techwolfx.ultimatevirus.commands.subcommands;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
@@ -29,7 +31,8 @@ public class CheckInfectionCMD extends SubCommand {
             case 1:
                 if(sender instanceof Player){
                     Player p = (Player) sender;
-                    p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgCheckVirus").replace("%result%", Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) ? "true" : "false"));
+                    String msg = (Ultimatevirus.getInstance().getLangMsg("MsgCheckVirus"));
+                    p.sendMessage(PlaceholderAPI.setPlaceholders(p, msg));
                 } else {
                     sender.sendMessage("§cThis command can only be executed by a player.");
                 }
@@ -42,10 +45,12 @@ public class CheckInfectionCMD extends SubCommand {
                         break;
                     }
                 }
-                try{
-                    sender.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgCheckVirusOthers").replace("%result%", Ultimatevirus.getInstance().getRDatabase().isInfected(args[1]) ? "true" : "false").replace("%target%", args[1]));
-                } catch (Exception ex){
-                    invalidPlayer(sender);
+                // Check if player is registered in database
+                if(Ultimatevirus.getInstance().getRDatabase().isPlayerRegistered(args[1])){
+                    String msg = (Ultimatevirus.getInstance().getLangMsg("MsgCheckVirusOthers").replace("%target%", args[1]));
+                    sender.sendMessage(PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(args[1]), msg));
+                } else {
+                    sender.sendMessage("§cThis player is not registered in database.");
                 }
                 break;
             default:

@@ -87,11 +87,12 @@ public abstract class Database {
         ResultSet rs = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '"+player+"';");
+            //ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '"+player+"';");
+            ps = conn.prepareStatement("SELECT player FROM " + table +";");
 
             rs = ps.executeQuery();
             while(rs.next()){
-                if(rs.getString("player").equals(player)){ // Tell database to search for the player you sent into the method. e.g getTokens(sam) It will look for sam.
+                if(rs.getString("player").equalsIgnoreCase(player)){ // Tell database to search for the player you sent into the method. e.g getTokens(sam) It will look for sam.
                     return true; // Return the players amount of kills. If you wanted to get total (just a random number for an example for you guys) You would change this to total!
                 }
             }
