@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
@@ -47,23 +48,23 @@ public abstract class Database {
 
 
     // Main methods
-    public void setTokens(Player player, Boolean infected, Integer points) {
+    public void setTokens(Player player, UUID uuid, Boolean infected, Integer points) {
         Connection conn = null;
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("REPLACE INTO " + table + " (player, infected, online_points) VALUES(?, ?, ?)"); // IMPORTANT. In SQLite class, We made 3 colums. player, Kills, Total.
+            ps = conn.prepareStatement("REPLACE INTO " + table + " (player, uuid, infected, online_points) VALUES(?, ?, ?, ?)"); // IMPORTANT. In SQLite class, We made 3 colums. player, Kills, Total.
             ps.setString(1, player.getName());                                                               // YOU MUST put these into this line!! And depending on how many
             // colums you put (say you made 5) All 5 need to be in the brackets
             // Seperated with comma's (,) AND there needs to be the same amount of
             // question marks in the VALUES brackets. Right now i only have 3 colums
             // So VALUES (?,?,?) If you had 5 colums VALUES(?,?,?,?,?)
-
-            ps.setInt(2, boolToInt(infected)); // This sets the value in the database. The colums go in order. Player is ID 1, kills is ID 2, Total would be 3 and so on. you can use
+            ps.setString(2, String.valueOf(uuid));
+            ps.setInt(3, boolToInt(infected)); // This sets the value in the database. The colums go in order. Player is ID 1, kills is ID 2, Total would be 3 and so on. you can use
             // setInt, setString and so on. tokens and total are just variables sent in, You can manually send values in as well. p.setInt(2, 10) <-
             // This would set the players kills instantly to 10. Sorry about the variable names, It sets their kills to 10 i just have the variable called
             // Tokens from another plugin :/
-            ps.setInt(3, points);
+            ps.setInt(4, points);
             ps.executeUpdate();
             return;
         } catch (SQLException ex) {
@@ -147,7 +148,7 @@ public abstract class Database {
         ResultSet rs;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '" + pName + "';");
+            ps = conn.prepareStatement("SELECT * FROM " + table + ";");
 
             rs = ps.executeQuery();
             while(rs.next()){

@@ -20,6 +20,7 @@ public class SQLite extends Database{
 
     public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS player_infos (" + // make sure to put your table name in here too.
             "`player` varchar(32) NOT NULL," + // This creates the different colums you will save data too. varchar(32) Is a string, int = integer
+            "`uuid` varchar(100) NOT NULL," +
             "`infected` BOOLEAN NOT NULL CHECK (`infected` IN (0,1))," +
             "`online_points` int(10) NOT NULL," +
             "PRIMARY KEY (`player`)" +  // This is creating 3 colums Player, Kills, Total. Primary key is what you are going to use as your indexer. Here we want to use player so

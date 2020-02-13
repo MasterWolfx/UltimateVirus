@@ -22,7 +22,12 @@ public class CustomPlaceholder implements Listener {
         PlaceholderAPI.registerPlaceholderHook("ultimatevirus", new PlaceholderHook() {
             @Override
             public String onRequest(OfflinePlayer p, String params) {
-                Bukkit.getConsoleSender().sendMessage("Player name: " + p.getName());
+                if(p == null){
+                    return null;
+                }
+                if(params.equalsIgnoreCase("isInfected")){
+                    return plugin.isInfectedReturnMsg(p.getName());
+                }
                 return null;
             }
 
@@ -32,14 +37,10 @@ public class CustomPlaceholder implements Listener {
                     return null;
                 }
                 if(params.equalsIgnoreCase("isInfected")){
-                    return customReturnMessage(p);
+                    return plugin.isInfectedReturnMsg(p.getName());
                 }
                 return null;
             }
         });
-    }
-
-    private String customReturnMessage(Player p){
-        return plugin.getRDatabase().isInfected(p.getName()) ? plugin.getConfig().getString("ReturnMsgWhenTrue").replace("&", "§") : plugin.getConfig().getString("ReturnMsgWhenFalse").replace("&", "§");
     }
 }

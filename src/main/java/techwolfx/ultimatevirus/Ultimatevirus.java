@@ -1,10 +1,7 @@
 package techwolfx.ultimatevirus;
 
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.Location;
-import org.bukkit.Material;
+
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -12,7 +9,6 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.junit.Before;
 import techwolfx.ultimatevirus.commands.CommandManager;
 import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
 import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
@@ -21,8 +17,8 @@ import techwolfx.ultimatevirus.database.SQLite;
 import techwolfx.ultimatevirus.files.Language;
 import techwolfx.ultimatevirus.listeners.PlayerEvents;
 import techwolfx.ultimatevirus.placeholders.CustomPlaceholder;
-
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -64,10 +60,10 @@ public final class Ultimatevirus extends JavaPlugin {
 
         Language.get().addDefault("MsgOnMaskHit", "&a&l(!) &aYour mask saved you from a virus!");
         Language.get().addDefault("MsgOnRecover", "&aYou recovered yourself from the virus!");
-        Language.get().addDefault("MsgCheckVirus", "&cInfected: &f%result%");
-        Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%result%");
-        Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
 
+        Language.get().addDefault("MsgCheckVirus", "&cInfected: &f%ultimatevirus_isInfected%");
+        Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%ultimatevirus_isInfected%");
+        Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
 
         Language.get().options().copyDefaults(true);
         Language.save();
@@ -77,7 +73,7 @@ public final class Ultimatevirus extends JavaPlugin {
     }
 
 
-    public CustomPlaceholder myPlaceholder;
+    public CustomPlaceholder myPlaceholder = null;
     // Enable the plugin
     @Override
     public void onEnable() {
@@ -97,10 +93,13 @@ public final class Ultimatevirus extends JavaPlugin {
 
         // Check if PlaceholderApi is enabled, and hook it
         if(Ultimatevirus.getInstance().getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
+            Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Hooked PlaceholderAPI.");
             myPlaceholder = new CustomPlaceholder(this);
         } else {
-            throw new RuntimeException("§cCould not find PlaceholderAPI!");
+            //throw new RuntimeException("§cCould not find PlaceholderAPI, some commands will not work properly.");
+            Bukkit.getConsoleSender().sendMessage("§cCould not find PlaceholderAPI, some commands will not work properly.");
         }
+
 
         // Enabling database
         this.db = new SQLite(this);
@@ -121,13 +120,31 @@ public final class Ultimatevirus extends JavaPlugin {
         if(getPlayersOnline().size() < minOnlinePlayers){
             return;
         }
-        try{
-            if(debug)
+        try {
+            if (debug)
                 Bukkit.getConsoleSender().sendMessage("Starting Main Process...");
 
-            Random rand = new Random();
             // Pick a random player between online players
+            Random rand = new Random();
             String pickedPlayerName = playersOnline.get(rand.nextInt(playersOnline.size()));
+            Player p = Bukkit.getPlayer(pickedPlayerName);
+
+            // Check if the pickedPlayer is already infected
+            if(getRDatabase().isInfected(pickedPlayerName)){
+                if(debug)
+                    Bukkit.getConsoleSender().sendMessage("Player already infected: " + pickedPlayerName);
+                return;
+            }
+
+            // Check if the pickedPlayer is in a disabled world
+            List<String> disabledWorlds = getConfig().getStringList("DisabledWorlds");
+            if (disabledWorlds.size() != 0) {
+                for (String world : disabledWorlds) {
+                    if (p.getWorld().getName().equals(world)) {
+                        return;
+                    }
+                }
+            }
 
             // Check if the picked player has the bypass permission
             if(Bukkit.getPlayer(pickedPlayerName).hasPermission("ultimatevirus.bypass")){
@@ -135,14 +152,8 @@ public final class Ultimatevirus extends JavaPlugin {
                     Bukkit.getConsoleSender().sendMessage("This player has the bypass permission: " + pickedPlayerName);
                 return;
             }
-            if(getRDatabase().isInfected(pickedPlayerName)){
-                if(debug)
-                    Bukkit.getConsoleSender().sendMessage("Player already infected: " + pickedPlayerName);
-                return;
-            }
 
-            Player p = Bukkit.getPlayer(pickedPlayerName);
-            assert p != null;
+
             Inventory inv = p.getInventory();
             String maskName = getConfig().getString("MaskDisplayName");
             int infectionProb = getConfig().getInt("InfectionPercentage");
@@ -225,7 +236,8 @@ public final class Ultimatevirus extends JavaPlugin {
         getRDatabase().setPoints(p, 0);
         getRDatabase().setInfected(p, true);
         p.sendTitle(getLangMsg("TitleOnInfection"), getLangMsg("SubtitleOnInfection"));
-        p.getPlayer().setMaxHealth(2);
+        int maxHealth = getConfig().getInt("MaximumHealthWhenInfected");
+        p.getPlayer().setMaxHealth(maxHealth);
         /*for(int i = 0 ; i < 5 ;i++) {
             p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY() + 2, p.getLocation().getZ()), Effect.MAGIC_CRIT, 50, 5);
         }*/
@@ -238,5 +250,9 @@ public final class Ultimatevirus extends JavaPlugin {
         /*for(int i = 0 ; i < 5 ; i++){
             p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY()+2, p.getLocation().getZ()), Effect.HAPPY_VILLAGER, 50, 5);
         }*/
+    }
+
+    public String isInfectedReturnMsg(String pName){
+        return getRDatabase().isInfected(pName) ? getConfig().getString("ReturnMsgWhenTrue").replace("&", "§") : getConfig().getString("ReturnMsgWhenFalse").replace("&", "§");
     }
 }

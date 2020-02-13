@@ -1,6 +1,10 @@
 # Keep this to false if you don't know what you are doing.
 Debug: false
 
+#################
+# Main Settings #
+#################
+
 # Items' display names.
 MaskDisplayName: "&2AntiVirus Mask"
 VaxinDisplayName: "&bVaxin"
@@ -27,9 +31,16 @@ EnableVaxinRecipe: true
 # Should a player receive a message when the mask saves him from a virus?
 MsgOnMaskHit: false
 
+######################
+# Infection Settings #
+######################
+
+# 2 Health points = 1 Hearth (20 = maximum health)
+MaximumHealthWhenInfected: 2
+
+ParticlesWhenInfected: true
 # You can find a list of ParticleTypes here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Particle.html
 # NOTE: Make sure that the particles you choose are supported in your server version.
-ParticlesWhenInfected: true
 InfectionParticleType: SLIME
 
 EnablePotionEffectsWhenInfected: true
@@ -41,9 +52,18 @@ PotionEffectsWhenInfected:
 # Duration in seconds
 PotionEffectsDuration: 10
 
-#
+##################
+# Other settings #
+##################
+
 # Custom Placeholder: %ultimatevirus_isInfected%
-# You can choose the message that this placeholder returns
-#
+# You can choose the message that this placeholder is going to return
+# This placeholder can be used inside lang.yml (MsgCheckVirus & MsgCheckVirusOthers) and is supported by any other plugin
+# that supports PlaceholderAPI.
 ReturnMsgWhenTrue: "yes"
 ReturnMsgWhenFalse: "no"
+
+# Some worlds in which the virus will not spread.
+DisabledWorlds:
+  - world1
+  - world2
