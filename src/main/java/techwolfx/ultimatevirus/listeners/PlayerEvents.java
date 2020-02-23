@@ -19,20 +19,9 @@ public class PlayerEvents implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        Ultimatevirus.getInstance().getPlayersOnline().add(e.getPlayer().getName());
         if(!Ultimatevirus.getInstance().getRDatabase().isPlayerRegistered(e.getPlayer().getName())){
             Ultimatevirus.getInstance().getRDatabase().setTokens(e.getPlayer(), e.getPlayer().getUniqueId(),false, 0);
         }
-        if(Ultimatevirus.getInstance().getConfig().getBoolean("Debug"))
-            Bukkit.getConsoleSender().sendMessage("Current List (Join): " + Ultimatevirus.getInstance().getPlayersOnline());
-    }
-
-    @EventHandler
-    public void onPlayerQuit(PlayerQuitEvent e){
-        Ultimatevirus.getInstance().getPlayersOnline().remove(e.getPlayer().getName());
-
-        if(Ultimatevirus.getInstance().getConfig().getBoolean("Debug"))
-            Bukkit.getConsoleSender().sendMessage("Current List (Quit): " + Ultimatevirus.getInstance().getPlayersOnline());
     }
 
     @EventHandler

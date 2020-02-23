@@ -3,7 +3,7 @@ version: ${project.version}
 main: techwolfx.ultimatevirus.Ultimatevirus
 authors: [MasterWolfx]
 description: Add a virus in your server.
-softdepend: [PlaceholderAPI, WorldGuard]
+softdepend: [PlaceholderAPI]
 commands:
   virus:
     description: Display all the plugin commands.

@@ -24,12 +24,23 @@ InfectionPercentage: 40
 # NOTE: these points are reset when a player catches a virus.
 OnlinePointsAddition: 5
 
+# Infection chance addition to catch a virus if a player is near an infected player (%).
+# NOTE: If a player is near 2 infected players, "ChanceAdditionWhenNearInfected" is doubled.
+ChanceAdditionWhenNearInfected: 10
+
+# Max distance (in blocks) required between an infected player and a healthy player to have a higher chance of being infected.
+SpreadDistanceBetweenPlayers: 10
+
 # NOTE: to apply recipes changes you must reload/restart the server.
 EnableMaskRecipe: true
 EnableVaxinRecipe: true
 
 # Should a player receive a message when the mask saves him from a virus?
 MsgOnMaskHit: false
+
+# Players can be infected only if their gamemode is set to survival
+InfectOnlyOnSurvivalGamemode: true
+
 
 ######################
 # Infection Settings #

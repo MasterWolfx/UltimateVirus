@@ -7,8 +7,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import techwolfx.ultimatevirus.commands.CmdTabCompletion;
 import techwolfx.ultimatevirus.commands.CommandManager;
 import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
 import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
@@ -27,9 +29,6 @@ public final class Ultimatevirus extends JavaPlugin {
 
     // Players Online List
     private ArrayList<String> playersOnline = new ArrayList<>();
-    public ArrayList<String> getPlayersOnline(){
-        return playersOnline;
-    }
 
     // Ultimatevirs instance
     private static Ultimatevirus instance;
@@ -72,13 +71,14 @@ public final class Ultimatevirus extends JavaPlugin {
         return Language.get().getString(s).replace("&", "§");
     }
 
-
     public CustomPlaceholder myPlaceholder = null;
+
     // Enable the plugin
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
         Objects.requireNonNull(getCommand("virus")).setExecutor(new CommandManager());
+        Objects.requireNonNull(getCommand("virus")).setTabCompleter(new CmdTabCompletion());
         instance = this;
         saveDefaultConfig();
 
@@ -114,10 +114,14 @@ public final class Ultimatevirus extends JavaPlugin {
 
     }
 
+    boolean debug = getConfig().getBoolean("Debug");
+
     private void mainProcess(){
         int minOnlinePlayers = getConfig().getInt("MinOnlinePlayers");
-        boolean debug = getConfig().getBoolean("Debug");
-        if(getPlayersOnline().size() < minOnlinePlayers){
+        updateOnlinePlayersList();
+
+        // Check if the minimum amount of players is online
+        if(playersOnline.size() < minOnlinePlayers){
             return;
         }
         try {
@@ -128,6 +132,15 @@ public final class Ultimatevirus extends JavaPlugin {
             Random rand = new Random();
             String pickedPlayerName = playersOnline.get(rand.nextInt(playersOnline.size()));
             Player p = Bukkit.getPlayer(pickedPlayerName);
+
+            // Check if the pickedPlayer is in survival mode
+            if(getConfig().getBoolean("InfectOnlyOnSurvivalGamemode")){
+                if(p.getGameMode() != GameMode.SURVIVAL){
+                    if(debug)
+                        Bukkit.getConsoleSender().sendMessage("This player is not in gamemode survival");
+                    return;
+                }
+            }
 
             // Check if the pickedPlayer is already infected
             if(getRDatabase().isInfected(pickedPlayerName)){
@@ -157,13 +170,14 @@ public final class Ultimatevirus extends JavaPlugin {
             Inventory inv = p.getInventory();
             String maskName = getConfig().getString("MaskDisplayName");
             int infectionProb = getConfig().getInt("InfectionPercentage");
-            int result = rand.nextInt(100);
             boolean msgOnMaskHit = getConfig().getBoolean("MsgOnMaskHit");
 
+            // Pick a random integer number between 0 to 100
+            int result = rand.nextInt(100);
             if(debug)
                 Bukkit.getConsoleSender().sendMessage("RANDOM NUMBER: " + result);
 
-            if(result <= infectionProb + getRDatabase().getPoints(p)){
+            if(result <= infectionProb + getRDatabase().getPoints(p) + getChanceAddPerNearInfectedPlayer(p)){
                 // Look for a mask inside player inventory: if mask is found, return
                 for(int i = 0 ; i < inv.getSize() ; i++){
                     if(debug)
@@ -194,12 +208,37 @@ public final class Ultimatevirus extends JavaPlugin {
                 int pointsAddition = getConfig().getInt("OnlinePointsAddition");
                 if(getRDatabase().getPoints(p) + infectionProb + pointsAddition <= 100){
                     getRDatabase().setPoints(p, getRDatabase().getPoints(p) + pointsAddition);
+                } else if(getRDatabase().getPoints(p) + infectionProb + pointsAddition > 100){
+                    getRDatabase().setPoints(p, 100 - infectionProb);
                 }
 
                 if(debug)
                     Bukkit.getConsoleSender().sendMessage("Virus avoided, skipping item check");
             }
         } catch (Exception ignored){ }
+    }
+
+    private void updateOnlinePlayersList(){
+        playersOnline.clear();
+        for( Player p : Bukkit.getOnlinePlayers()){
+            playersOnline.add(p.getName());
+        }
+    }
+    // Get the amount of infected players near the pickedPlayer
+    private int getChanceAddPerNearInfectedPlayer(Player target){
+        int chanceAddNearInfected = getConfig().getInt("ChanceAdditionWhenNearInfected");
+        int distance = getConfig().getInt("SpreadDistanceBetweenPlayers");
+        int result = 0;
+        for(Player nearPlayer : Bukkit.getOnlinePlayers()){
+            // If the healthy player is inside the range of an infected player
+            if(nearPlayer.getLocation().distance(target.getLocation()) <= distance){
+                result += chanceAddNearInfected;
+            }
+        }
+        if(debug){
+            Bukkit.getConsoleSender().sendMessage("Infection chance added to the player per near infected player: " + (result-chanceAddNearInfected) );
+        }
+        return result-chanceAddNearInfected;
     }
 
     public void maskRecipe(){
@@ -245,7 +284,9 @@ public final class Ultimatevirus extends JavaPlugin {
     public void setHealthy(Player p){
         getRDatabase().setInfected(p, false);
         p.sendMessage(getLangMsg("MsgOnRecover"));
-        p.removePotionEffect(PotionEffectType.CONFUSION);
+        for(PotionEffect effect : p.getActivePotionEffects()){
+            p.removePotionEffect(effect.getType());
+        }
         p.setMaxHealth(20);
         /*for(int i = 0 ; i < 5 ; i++){
             p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY()+2, p.getLocation().getZ()), Effect.HAPPY_VILLAGER, 50, 5);
