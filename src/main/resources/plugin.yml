@@ -2,7 +2,7 @@ name: Ultimatevirus
 version: ${project.version}
 main: techwolfx.ultimatevirus.Ultimatevirus
 authors: [MasterWolfx]
-description: Add a virus in your server.
+description: Add a fully customizable virus to your server.
 softdepend: [PlaceholderAPI]
 commands:
   virus:

@@ -18,18 +18,14 @@ InfectionSpreadDelay: 10
 # The chance that a player has of catching a virus (from 0(%) to 100(%)).
 InfectionPercentage: 40
 
+# The amount of damage that the mask will take after saving a player from a virus
+MaskDmgOnVirusSave: 1
+
 # Every time a player avoids a virus some "OnlinePoints" are added to his stats,
 # the more OnlinePoints he has the more chance he has to catch a virus next time.
 # These points will be added to the InfectionPercentage.
 # NOTE: these points are reset when a player catches a virus.
 OnlinePointsAddition: 5
-
-# Infection chance addition to catch a virus if a player is near an infected player (%).
-# NOTE: If a player is near 2 infected players, "ChanceAdditionWhenNearInfected" is doubled.
-ChanceAdditionWhenNearInfected: 10
-
-# Max distance (in blocks) required between an infected player and a healthy player to have a higher chance of being infected.
-SpreadDistanceBetweenPlayers: 10
 
 # NOTE: to apply recipes changes you must reload/restart the server.
 EnableMaskRecipe: true
@@ -40,7 +36,6 @@ MsgOnMaskHit: false
 
 # Players can be infected only if their gamemode is set to survival
 InfectOnlyOnSurvivalGamemode: true
-
 
 ######################
 # Infection Settings #
@@ -62,6 +57,32 @@ PotionEffectsWhenInfected:
   - CONFUSION#3
 # Duration in seconds
 PotionEffectsDuration: 10
+
+# Infection chance addition to catch a virus if a player is near an infected player (%).
+# NOTE: If a player is near 2 infected players, "ChanceAdditionWhenNearInfected" is doubled.
+ChanceAdditionWhenNearInfected: 10
+
+# Max distance (in blocks) required between an infected player and a healthy player to have a higher chance of being infected.
+SpreadDistanceBetweenPlayers: 10
+
+########################
+# Custom Infected Mobs #
+########################
+
+EnableMobInfection: true
+
+# A list of mobs that can become infected
+MobTypes:
+  - ZOMBIE
+
+MobInfectionSpreadChance: 50
+
+# The amount of damage dealt to a player mask when he is hitted by an infected mob.
+# NOTE: the mask has by default 55 hp
+MaskDmgOnInfectedMobHit: 5
+
+# The custom name that an infected mob has. Here you can use %mob_type% to get displayed the name of the mob.
+CustomMobName: "§c§nInfected §f§l%mob_type%"
 
 ##################
 # Other settings #

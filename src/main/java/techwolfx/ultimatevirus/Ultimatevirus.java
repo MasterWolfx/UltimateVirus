@@ -62,6 +62,7 @@ public final class Ultimatevirus extends JavaPlugin {
 
         Language.get().addDefault("MsgCheckVirus", "&cInfected: &f%ultimatevirus_isInfected%");
         Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%ultimatevirus_isInfected%");
+        Language.get().addDefault("MsgHitByInfectedMob", "&cAn infected mob as hitted you!");
         Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
 
         Language.get().options().copyDefaults(true);
@@ -100,7 +101,6 @@ public final class Ultimatevirus extends JavaPlugin {
             Bukkit.getConsoleSender().sendMessage("§cCould not find PlaceholderAPI, some commands will not work properly.");
         }
 
-
         // Enabling database
         this.db = new SQLite(this);
         this.db.load();
@@ -115,7 +115,6 @@ public final class Ultimatevirus extends JavaPlugin {
     }
 
     boolean debug = getConfig().getBoolean("Debug");
-
     private void mainProcess(){
         int minOnlinePlayers = getConfig().getInt("MinOnlinePlayers");
         updateOnlinePlayersList();
@@ -166,11 +165,7 @@ public final class Ultimatevirus extends JavaPlugin {
                 return;
             }
 
-
-            Inventory inv = p.getInventory();
-            String maskName = getConfig().getString("MaskDisplayName");
             int infectionProb = getConfig().getInt("InfectionPercentage");
-            boolean msgOnMaskHit = getConfig().getBoolean("MsgOnMaskHit");
 
             // Pick a random integer number between 0 to 100
             int result = rand.nextInt(100);
@@ -178,31 +173,8 @@ public final class Ultimatevirus extends JavaPlugin {
                 Bukkit.getConsoleSender().sendMessage("RANDOM NUMBER: " + result);
 
             if(result <= infectionProb + getRDatabase().getPoints(p) + getChanceAddPerNearInfectedPlayer(p)){
-                // Look for a mask inside player inventory: if mask is found, return
-                for(int i = 0 ; i < inv.getSize() ; i++){
-                    if(debug)
-                        Bukkit.getConsoleSender().sendMessage("Checking item " + i);
-                    ItemStack item = inv.getItem(i);
-                    if(item != null){
-                        if(item.getType() == Material.LEATHER_HELMET && item.getItemMeta().getDisplayName().equals(maskName.replace("&", "§"))){
-                            // Checking mask durability: if it is negative, destroy it
-                            if(item.getDurability() < item.getType().getMaxDurability()-1){
-                                item.setDurability((short)(item.getDurability()+ 1));
-                                if(item.getDurability() > item.getType().getMaxDurability()-5){
-                                    p.sendTitle(getLangMsg("TitleOnLowMaskHealth"), getLangMsg("SubtitleOnLowMaskHealth").replace("%hp%", Short.toString((short)(item.getType().getMaxDurability() - item.getDurability()))) );
-                                }
-                            } else {
-                                inv.remove(item);
-                                p.sendTitle(getLangMsg("TitleOnMaskBreak"), getLangMsg("SubtitleOnMaskBreak"));
-                            }
-                            if(msgOnMaskHit){
-                                p.sendMessage(getLangMsg("MsgOnMaskHit"));
-                            }
-                            return;
-                        }
-                    }
-                }
-                setInfected(p);
+                int maskDmg = getConfig().getInt("MaskDmgOnVirusSave");
+                maskChecks(p, maskDmg);
             } else {
                 // The player avoided the virus, adding online points to his stats
                 int pointsAddition = getConfig().getInt("OnlinePointsAddition");
@@ -241,10 +213,11 @@ public final class Ultimatevirus extends JavaPlugin {
         return result-chanceAddNearInfected;
     }
 
-    public void maskRecipe(){
+    private void maskRecipe(){
         ItemStack maskItem = MaskCMD.getMask();
 
-        ShapedRecipe maskRecipe = new ShapedRecipe(maskItem);
+        NamespacedKey key = new NamespacedKey(this, "virus_mask");
+        ShapedRecipe maskRecipe = new ShapedRecipe(key, maskItem);
 
         maskRecipe.shape("***","%%%","LLL");
 
@@ -254,10 +227,11 @@ public final class Ultimatevirus extends JavaPlugin {
 
         getServer().addRecipe(maskRecipe);
     }
-    public void vaxinRecipe(){
+    private void vaxinRecipe(){
         ItemStack vaxinItem = VaxinCMD.getVaxin();
 
-        ShapedRecipe vaxinRecipe = new ShapedRecipe(vaxinItem);
+        NamespacedKey key = new NamespacedKey(this, "virus_vaxin");
+        ShapedRecipe vaxinRecipe = new ShapedRecipe(key, vaxinItem);
 
         vaxinRecipe.shape("ESW","SPS","RSB");
 
@@ -295,5 +269,35 @@ public final class Ultimatevirus extends JavaPlugin {
 
     public String isInfectedReturnMsg(String pName){
         return getRDatabase().isInfected(pName) ? getConfig().getString("ReturnMsgWhenTrue").replace("&", "§") : getConfig().getString("ReturnMsgWhenFalse").replace("&", "§");
+    }
+    public void maskChecks(Player p, int maskDmg){
+        String maskName = getConfig().getString("MaskDisplayName");
+        boolean msgOnMaskHit = getConfig().getBoolean("MsgOnMaskHit");
+        Inventory inv = p.getInventory();
+        // Look for a mask inside player inventory: if mask is found, return
+        for(int i = 0 ; i < inv.getSize() ; i++){
+            if(debug)
+                Bukkit.getConsoleSender().sendMessage("Checking item " + i);
+            ItemStack item = inv.getItem(i);
+            if(item != null){
+                if(item.getType() == Material.LEATHER_HELMET && item.getItemMeta().getDisplayName().equals(maskName.replace("&", "§"))){
+                    // Checking mask durability: if it is negative, destroy it
+                    if(item.getDurability() < item.getType().getMaxDurability()-maskDmg){
+                        item.setDurability((short)(item.getDurability()+maskDmg));
+                        if(item.getDurability() >= item.getType().getMaxDurability()-5){
+                            p.sendTitle(getLangMsg("TitleOnLowMaskHealth"), getLangMsg("SubtitleOnLowMaskHealth").replace("%hp%", Short.toString((short)(item.getType().getMaxDurability() - item.getDurability()))) );
+                        }
+                    } else {
+                        inv.remove(item);
+                        p.sendTitle(getLangMsg("TitleOnMaskBreak"), getLangMsg("SubtitleOnMaskBreak"));
+                    }
+                    if(msgOnMaskHit){
+                        p.sendMessage(getLangMsg("MsgOnMaskHit"));
+                    }
+                    return;
+                }
+            }
+        }
+        setInfected(p);
     }
 }
