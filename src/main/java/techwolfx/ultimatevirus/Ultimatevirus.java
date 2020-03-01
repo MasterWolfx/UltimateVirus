@@ -62,7 +62,7 @@ public final class Ultimatevirus extends JavaPlugin {
 
         Language.get().addDefault("MsgCheckVirus", "&cInfected: &f%ultimatevirus_isInfected%");
         Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%ultimatevirus_isInfected%");
-        Language.get().addDefault("MsgHitByInfectedMob", "&cAn infected mob as hitted you!");
+        Language.get().addDefault("MsgHitByInfectedMob", "&cAn infected mob as hitted you! (-%mask_dmg% HP to your mask)");
         Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
 
         Language.get().options().copyDefaults(true);
@@ -226,6 +226,7 @@ public final class Ultimatevirus extends JavaPlugin {
         maskRecipe.setIngredient('L', Material.LEATHER);
 
         getServer().addRecipe(maskRecipe);
+        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Enabled custom Mask recipe.");
     }
     private void vaxinRecipe(){
         ItemStack vaxinItem = VaxinCMD.getVaxin();
@@ -243,6 +244,7 @@ public final class Ultimatevirus extends JavaPlugin {
         vaxinRecipe.setIngredient('W', Material.EGG);
 
         getServer().addRecipe(vaxinRecipe);
+        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Enabled custom Vaxin recipe.");
     }
 
     public void setInfected(Player p){

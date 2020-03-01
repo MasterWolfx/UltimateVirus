@@ -116,8 +116,8 @@ public class PlayerEvents implements Listener {
                 if(p.hasPermission("ultimatevirus.bypass")){
                     return;
                 }
-                p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgHitByInfectedMob"));
                 int maskDmg = Ultimatevirus.getInstance().getConfig().getInt("MaskDmgOnInfectedMobHit");
+                p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
                 Ultimatevirus.getInstance().maskChecks(p, maskDmg);
             }
         }
@@ -164,32 +164,9 @@ public class PlayerEvents implements Listener {
             Random rand = new Random();
             int spreadChance = Ultimatevirus.getInstance().getConfig().getInt("MobInfectionSpreadChance");
             int result = rand.nextInt(100);
-            if( result < spreadChance ){
+            if( result <= spreadChance ){
                 e.getEntity().setCustomName(customName.replace("&", "§").replace("%mob_type%", e.getEntity().getName()));
             }
         }
-
-        /*
-        Location loc = e.getLocation();
-        World world = loc.getWorld();
-        for (LivingEntity entity : world.getLivingEntities()) {
-            goAhead = false;
-            for (String mob : enabledMobs){
-                if(entity.getType() == EntityType.fromName(mob.toUpperCase())){
-                    goAhead = true;
-                    break;
-                }
-            }
-            if(goAhead){
-                if (entity.getCustomName() == null) {
-                    Random rand = new Random();
-                    int spreadChance = Ultimatevirus.getInstance().getConfig().getInt("MobInfectionSpreadChance");
-                    int result = rand.nextInt(100);
-                    if( result < spreadChance ){
-                        entity.setCustomName(customName.replace("&", "§").replace("%mob_type%", entity.getName()));
-                    }
-                }
-            }
-        }*/
     }
 }
