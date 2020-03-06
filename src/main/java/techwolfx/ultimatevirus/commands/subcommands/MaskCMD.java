@@ -1,6 +1,7 @@
 package techwolfx.ultimatevirus.commands.subcommands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MaskCMD extends SubCommand {
@@ -25,11 +27,13 @@ public class MaskCMD extends SubCommand {
         im.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
         im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(" &2&l* &7Protect yourself from virus.".replace("&", "§"));
-        lore.add("&2&oYou must keep this mask ".replace("&", "§"));
-        lore.add("&2&oin your inventory.".replace("&", "§"));
-        im.setLore(lore);
+        List<String> lore = Ultimatevirus.getInstance().getConfig().getStringList("MaskLore");
+        List<String> newLore = new ArrayList<>();
+        for (String line : lore) {
+            newLore.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+        im.setLore(newLore);
+
         mask.setItemMeta(im);
         return mask;
     }

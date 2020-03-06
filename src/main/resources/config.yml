@@ -5,9 +5,18 @@ Debug: false
 # Main Settings #
 #################
 
-# Items' display names.
+# Items' display names and lores.
 MaskDisplayName: "&2AntiVirus Mask"
+MaskLore:
+  - "&2&l* &7Protect yourself from virus."
+  - "&2&oYou must keep this mask"
+  - "&2&oin your inventory."
+
 VaxinDisplayName: "&bVaxin"
+VaxinLore:
+  - "&b&l* &7Recover yourself from a virus."
+  - "&b&oYou can drink this vaxin"
+  - "&b&oonly if u are infected."
 
 # Minimum number of Online Players to start the virus spreading.
 MinOnlinePlayers: 1
@@ -18,8 +27,9 @@ InfectionSpreadDelay: 10
 # The chance that a player has of catching a virus (from 0(%) to 100(%)).
 InfectionPercentage: 40
 
-# The amount of damage that the mask will take after saving a player from a virus
-MaskDmgOnVirusSave: 1
+# If enabled a broadcast warning will be sent every time the infection spreads.
+# You can customize the msg in the lang.yml file.
+BroadcastWarningOnVirusSpread: false
 
 # Every time a player avoids a virus some "OnlinePoints" are added to his stats,
 # the more OnlinePoints he has the more chance he has to catch a virus next time.
@@ -31,6 +41,10 @@ OnlinePointsAddition: 5
 EnableMaskRecipe: true
 EnableVaxinRecipe: true
 
+# The amount of damage that the mask will take after saving a player from a virus
+MaskDmgOnVirusSave: 1
+# The amount of mask's hp for which the player will start receiving warning messages (MAX mask hp: 55)
+MaskLowHpWarnings: 5
 # Should a player receive a message when the mask saves him from a virus?
 MsgOnMaskHit: false
 
@@ -72,17 +86,19 @@ SpreadDistanceBetweenPlayers: 10
 EnableMobInfection: true
 
 # A list of mobs that can become infected
+# You can find a list of mob types here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
 MobTypes:
   - ZOMBIE
 
-MobInfectionSpreadChance: 50
+# The chance that a mob has to become infected when spawns (%).
+MobInfectionSpreadChance: 20
+
+# The custom name that an infected mob has. Here you can use %mob_type% to get displayed the name of the mob.
+CustomMobName: "&c&nInfected&f&l %mob_type%"
 
 # The amount of damage dealt to a player mask when he is hitted by an infected mob.
 # NOTE: the mask has by default 55 hp
 MaskDmgOnInfectedMobHit: 5
-
-# The custom name that an infected mob has. Here you can use %mob_type% to get displayed the name of the mob.
-CustomMobName: "§c§nInfected §f§l%mob_type%"
 
 ##################
 # Other settings #

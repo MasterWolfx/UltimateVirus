@@ -92,23 +92,26 @@ public class PlayerEvents implements Listener {
 
     @EventHandler
     public void onMobHit(EntityDamageByEntityEvent e){
+        boolean mobInfection = Ultimatevirus.getInstance().getConfig().getBoolean("EnableMobInfection");
+        if(!mobInfection){
+            return;
+        }
+
         Entity damager = e.getDamager();
         Entity damaged = e.getEntity();
 
         if(damager instanceof Monster && damaged instanceof Player){
 
             List<String> enabledMobs = Ultimatevirus.getInstance().getConfig().getStringList("MobTypes");
-            String customName = Ultimatevirus.getInstance().getConfig().getString("CustomMobName").replace("&", "§").replace("%mob_type%", damager.getName());
+            String customName = Ultimatevirus.getInstance().getConfig().getString("CustomMobName").replace("&", "§").replace("%mob_type%", capitalizeMobTypeName( damager.getType().getName() ));
             boolean goAhead = false;
             for (String mob : enabledMobs){
-                // Check if the mob had the right custom name
+                // Check if the mob has the right custom name
                 if(damager.getType() == EntityType.fromName(mob.toUpperCase()) && damager.getCustomName() != null){
-                    goAhead = true;
-                    break;
-                    /*if(damager.getCustomName().equals(customName)){
+                    if(damager.getCustomName().equals(customName)){
                         goAhead = true;
                         break;
-                    }*/
+                    }
                 }
             }
             if(goAhead){
@@ -165,8 +168,13 @@ public class PlayerEvents implements Listener {
             int spreadChance = Ultimatevirus.getInstance().getConfig().getInt("MobInfectionSpreadChance");
             int result = rand.nextInt(100);
             if( result <= spreadChance ){
-                e.getEntity().setCustomName(customName.replace("&", "§").replace("%mob_type%", e.getEntity().getName()));
+
+                e.getEntity().setCustomName(customName.replace("&", "§").replace("%mob_type%", capitalizeMobTypeName( e.getEntity().getType().getName() ) ) );
             }
         }
+    }
+
+    private String capitalizeMobTypeName(String s){
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }

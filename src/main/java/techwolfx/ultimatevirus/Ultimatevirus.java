@@ -8,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import techwolfx.ultimatevirus.commands.CmdTabCompletion;
 import techwolfx.ultimatevirus.commands.CommandManager;
@@ -64,6 +63,7 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%ultimatevirus_isInfected%");
         Language.get().addDefault("MsgHitByInfectedMob", "&cAn infected mob as hitted you! (-%mask_dmg% HP to your mask)");
         Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
+        Language.get().addDefault("BroadcastOnVirusSpread", "&4The virus is spreading out. Please wear a mask!");
 
         Language.get().options().copyDefaults(true);
         Language.save();
@@ -85,6 +85,10 @@ public final class Ultimatevirus extends JavaPlugin {
 
         // Creating lang.yml
         langFileSetup();
+
+        // Enabling database
+        this.db = new SQLite(this);
+        this.db.load();
 
         // Enabling custom recipes
         if(getConfig().getBoolean("EnableMaskRecipe"))
@@ -118,6 +122,10 @@ public final class Ultimatevirus extends JavaPlugin {
     private void mainProcess(){
         int minOnlinePlayers = getConfig().getInt("MinOnlinePlayers");
         updateOnlinePlayersList();
+
+        if(getConfig().getBoolean("BroadcastWarningOnVirusSpread")){
+            Bukkit.broadcastMessage(getLangMsg("BroadcastOnVirusSpread"));
+        }
 
         // Check if the minimum amount of players is online
         if(playersOnline.size() < minOnlinePlayers){
@@ -215,9 +223,14 @@ public final class Ultimatevirus extends JavaPlugin {
 
     private void maskRecipe(){
         ItemStack maskItem = MaskCMD.getMask();
+        ShapedRecipe maskRecipe;
 
-        NamespacedKey key = new NamespacedKey(this, "virus_mask");
-        ShapedRecipe maskRecipe = new ShapedRecipe(key, maskItem);
+        if(getServer().getVersion().contains("1.8")){
+            maskRecipe = new ShapedRecipe(maskItem);
+        } else {
+            NamespacedKey key = new NamespacedKey(this, "virus_mask");
+            maskRecipe = new ShapedRecipe(key, maskItem);
+        }
 
         maskRecipe.shape("***","%%%","LLL");
 
@@ -230,9 +243,14 @@ public final class Ultimatevirus extends JavaPlugin {
     }
     private void vaxinRecipe(){
         ItemStack vaxinItem = VaxinCMD.getVaxin();
+        ShapedRecipe vaxinRecipe;
 
-        NamespacedKey key = new NamespacedKey(this, "virus_vaxin");
-        ShapedRecipe vaxinRecipe = new ShapedRecipe(key, vaxinItem);
+        if(getServer().getVersion().contains("1.8")){
+            vaxinRecipe = new ShapedRecipe(vaxinItem);
+        } else {
+            NamespacedKey key = new NamespacedKey(this, "virus_vaxin");
+            vaxinRecipe = new ShapedRecipe(key, vaxinItem);
+        }
 
         vaxinRecipe.shape("ESW","SPS","RSB");
 
@@ -275,6 +293,8 @@ public final class Ultimatevirus extends JavaPlugin {
     public void maskChecks(Player p, int maskDmg){
         String maskName = getConfig().getString("MaskDisplayName");
         boolean msgOnMaskHit = getConfig().getBoolean("MsgOnMaskHit");
+        int hpStartWarnings = getConfig().getInt("MaskLowHpWarnings");
+
         Inventory inv = p.getInventory();
         // Look for a mask inside player inventory: if mask is found, return
         for(int i = 0 ; i < inv.getSize() ; i++){
@@ -286,7 +306,7 @@ public final class Ultimatevirus extends JavaPlugin {
                     // Checking mask durability: if it is negative, destroy it
                     if(item.getDurability() < item.getType().getMaxDurability()-maskDmg){
                         item.setDurability((short)(item.getDurability()+maskDmg));
-                        if(item.getDurability() >= item.getType().getMaxDurability()-5){
+                        if(item.getDurability() >= item.getType().getMaxDurability() - hpStartWarnings){
                             p.sendTitle(getLangMsg("TitleOnLowMaskHealth"), getLangMsg("SubtitleOnLowMaskHealth").replace("%hp%", Short.toString((short)(item.getType().getMaxDurability() - item.getDurability()))) );
                         }
                     } else {

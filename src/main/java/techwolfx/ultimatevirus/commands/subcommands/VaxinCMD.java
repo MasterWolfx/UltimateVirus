@@ -1,6 +1,7 @@
 package techwolfx.ultimatevirus.commands.subcommands;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -13,6 +14,7 @@ import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class VaxinCMD extends SubCommand {
 
@@ -25,11 +27,13 @@ public class VaxinCMD extends SubCommand {
         im.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
         im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 
-        ArrayList<String> lore = new ArrayList<>();
-        lore.add(" &b&l* &7Recover yourself from a virus.".replace("&", "§"));
-        lore.add("&b&oYou can drink this vaxin ".replace("&", "§"));
-        lore.add("&b&oonly if u are infected.".replace("&", "§"));
-        im.setLore(lore);
+        List<String> lore = Ultimatevirus.getInstance().getConfig().getStringList("VaxinLore");
+        List<String> newLore = new ArrayList<>();
+        for (String line : lore) {
+            newLore.add(ChatColor.translateAlternateColorCodes('&', line));
+        }
+        im.setLore(newLore);
+
         vaxin.setItemMeta(im);
         return vaxin;
     }
