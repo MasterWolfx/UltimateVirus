@@ -63,7 +63,7 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%ultimatevirus_isInfected%");
         Language.get().addDefault("MsgHitByInfectedMob", "&cAn infected mob as hitted you! (-%mask_dmg% HP to your mask)");
         Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
-        Language.get().addDefault("BroadcastOnVirusSpread", "&4The virus is spreading out. Please wear a mask!");
+        Language.get().addDefault("BroadcastOnPlayerInfection", "&4The health department confirm a new case of the virus. %player% is now infected.");
 
         Language.get().options().copyDefaults(true);
         Language.save();
@@ -121,16 +121,13 @@ public final class Ultimatevirus extends JavaPlugin {
     boolean debug = getConfig().getBoolean("Debug");
     private void mainProcess(){
         int minOnlinePlayers = getConfig().getInt("MinOnlinePlayers");
+
         updateOnlinePlayersList();
-
-        if(getConfig().getBoolean("BroadcastWarningOnVirusSpread")){
-            Bukkit.broadcastMessage(getLangMsg("BroadcastOnVirusSpread"));
-        }
-
         // Check if the minimum amount of players is online
         if(playersOnline.size() < minOnlinePlayers){
             return;
         }
+
         try {
             if (debug)
                 Bukkit.getConsoleSender().sendMessage("Starting Main Process...");
@@ -165,9 +162,13 @@ public final class Ultimatevirus extends JavaPlugin {
                     }
                 }
             }
-
+            if(p.isOp() && !getConfig().getBoolean("InfectOpPlayers")){
+                if(debug)
+                    Bukkit.getConsoleSender().sendMessage("This player is op and he cant be infected (config.yml): " + pickedPlayerName);
+                return;
+            }
             // Check if the picked player has the bypass permission
-            if(Bukkit.getPlayer(pickedPlayerName).hasPermission("ultimatevirus.bypass")){
+            if(!p.isOp() && p.hasPermission("ultimatevirus.bypass")){
                 if(debug)
                     Bukkit.getConsoleSender().sendMessage("This player has the bypass permission: " + pickedPlayerName);
                 return;
@@ -200,7 +201,7 @@ public final class Ultimatevirus extends JavaPlugin {
 
     private void updateOnlinePlayersList(){
         playersOnline.clear();
-        for( Player p : Bukkit.getOnlinePlayers()){
+        for( Player p : Bukkit.getOnlinePlayers() ){
             playersOnline.add(p.getName());
         }
     }
@@ -225,7 +226,7 @@ public final class Ultimatevirus extends JavaPlugin {
         ItemStack maskItem = MaskCMD.getMask();
         ShapedRecipe maskRecipe;
 
-        if(getServer().getVersion().contains("1.8")){
+        if(getServer().getVersion().contains("1.8") || getServer().getVersion().contains("1.9") || getServer().getVersion().contains("1.10")){
             maskRecipe = new ShapedRecipe(maskItem);
         } else {
             NamespacedKey key = new NamespacedKey(this, "virus_mask");
@@ -245,7 +246,7 @@ public final class Ultimatevirus extends JavaPlugin {
         ItemStack vaxinItem = VaxinCMD.getVaxin();
         ShapedRecipe vaxinRecipe;
 
-        if(getServer().getVersion().contains("1.8")){
+        if(getServer().getVersion().contains("1.8") || getServer().getVersion().contains("1.9") || getServer().getVersion().contains("1.10")){
             vaxinRecipe = new ShapedRecipe(vaxinItem);
         } else {
             NamespacedKey key = new NamespacedKey(this, "virus_vaxin");
@@ -271,9 +272,9 @@ public final class Ultimatevirus extends JavaPlugin {
         p.sendTitle(getLangMsg("TitleOnInfection"), getLangMsg("SubtitleOnInfection"));
         int maxHealth = getConfig().getInt("MaximumHealthWhenInfected");
         p.getPlayer().setMaxHealth(maxHealth);
-        /*for(int i = 0 ; i < 5 ;i++) {
-            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY() + 2, p.getLocation().getZ()), Effect.MAGIC_CRIT, 50, 5);
-        }*/
+        if(getConfig().getBoolean("BroadcastOnPlayerInfection")){
+            Bukkit.broadcastMessage(getLangMsg("BroadcastOnPlayerInfection").replace("%player%", p.getName()));
+        }
     }
     public void setHealthy(Player p){
         getRDatabase().setInfected(p, false);

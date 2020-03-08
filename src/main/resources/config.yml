@@ -22,14 +22,14 @@ VaxinLore:
 MinOnlinePlayers: 1
 
 # The time (in seconds) between each time the virus tries to infect a random player.
-InfectionSpreadDelay: 10
+InfectionSpreadDelay: 60
 
 # The chance that a player has of catching a virus (from 0(%) to 100(%)).
 InfectionPercentage: 40
 
 # If enabled a broadcast warning will be sent every time the infection spreads.
 # You can customize the msg in the lang.yml file.
-BroadcastWarningOnVirusSpread: false
+BroadcastOnPlayerInfection: false
 
 # Every time a player avoids a virus some "OnlinePoints" are added to his stats,
 # the more OnlinePoints he has the more chance he has to catch a virus next time.
@@ -50,6 +50,8 @@ MsgOnMaskHit: false
 
 # Players can be infected only if their gamemode is set to survival
 InfectOnlyOnSurvivalGamemode: true
+# If enabled also OP players will catch the virus
+InfectOpPlayers: false
 
 ######################
 # Infection Settings #
