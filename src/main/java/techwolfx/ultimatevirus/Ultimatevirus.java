@@ -16,8 +16,9 @@ import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
 import techwolfx.ultimatevirus.database.Database;
 import techwolfx.ultimatevirus.database.SQLite;
 import techwolfx.ultimatevirus.files.Language;
+import techwolfx.ultimatevirus.listeners.MobEvents;
 import techwolfx.ultimatevirus.listeners.PlayerEvents;
-import techwolfx.ultimatevirus.placeholders.CustomPlaceholder;
+import techwolfx.ultimatevirus.placeholders.IsInfectedPlaceholder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -63,7 +64,8 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%ultimatevirus_isInfected%");
         Language.get().addDefault("MsgHitByInfectedMob", "&cAn infected mob as hitted you! (-%mask_dmg% HP to your mask)");
         Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
-        Language.get().addDefault("BroadcastOnPlayerInfection", "&4The health department confirm a new case of the virus. %player% is now infected.");
+        Language.get().addDefault("BroadcastOnPlayerInfection", "&4The health department confirms a new case of the virus. %player% is now infected.");
+        Language.get().addDefault("BroadcastOnPlayerCure", "&2The health department announces that %player% recovered from the virus.");
 
         Language.get().options().copyDefaults(true);
         Language.save();
@@ -72,11 +74,12 @@ public final class Ultimatevirus extends JavaPlugin {
         return Language.get().getString(s).replace("&", "§");
     }
 
-    public CustomPlaceholder myPlaceholder = null;
+    public IsInfectedPlaceholder myPlaceholder = null;
 
     // Enable the plugin
     @Override
     public void onEnable() {
+        getServer().getPluginManager().registerEvents(new MobEvents(), this);
         getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
         Objects.requireNonNull(getCommand("virus")).setExecutor(new CommandManager());
         Objects.requireNonNull(getCommand("virus")).setTabCompleter(new CmdTabCompletion());
@@ -99,7 +102,7 @@ public final class Ultimatevirus extends JavaPlugin {
         // Check if PlaceholderApi is enabled, and hook it
         if(Ultimatevirus.getInstance().getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
             Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Hooked PlaceholderAPI.");
-            myPlaceholder = new CustomPlaceholder(this);
+            myPlaceholder = new IsInfectedPlaceholder(this);
         } else {
             //throw new RuntimeException("§cCould not find PlaceholderAPI, some commands will not work properly.");
             Bukkit.getConsoleSender().sendMessage("§cCould not find PlaceholderAPI, some commands will not work properly.");
@@ -115,10 +118,10 @@ public final class Ultimatevirus extends JavaPlugin {
         int checkInterval = getConfig().getInt("InfectionSpreadDelay");
 
         scheduler.scheduleSyncRepeatingTask(this, this::mainProcess, 0L, checkInterval*20);
-
     }
 
     boolean debug = getConfig().getBoolean("Debug");
+
     private void mainProcess(){
         int minOnlinePlayers = getConfig().getInt("MinOnlinePlayers");
 
@@ -205,6 +208,7 @@ public final class Ultimatevirus extends JavaPlugin {
             playersOnline.add(p.getName());
         }
     }
+
     // Get the amount of infected players near the pickedPlayer
     private int getChanceAddPerNearInfectedPlayer(Player target){
         int chanceAddNearInfected = getConfig().getInt("ChanceAdditionWhenNearInfected");
@@ -278,21 +282,24 @@ public final class Ultimatevirus extends JavaPlugin {
     }
     public void setHealthy(Player p){
         getRDatabase().setInfected(p, false);
+        p.setMaxHealth(20);
         p.sendMessage(getLangMsg("MsgOnRecover"));
         for(PotionEffect effect : p.getActivePotionEffects()){
             p.removePotionEffect(effect.getType());
         }
-        p.setMaxHealth(20);
-        /*for(int i = 0 ; i < 5 ; i++){
-            p.getWorld().playEffect(new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY()+2, p.getLocation().getZ()), Effect.HAPPY_VILLAGER, 50, 5);
-        }*/
+        if(getConfig().getBoolean("BroadcastOnPlayerCure")){
+            Bukkit.broadcastMessage(getLangMsg("BroadcastOnPlayerCure").replace("%player%", p.getName()));
+        }
     }
 
     public String isInfectedReturnMsg(String pName){
-        return getRDatabase().isInfected(pName) ? getConfig().getString("ReturnMsgWhenTrue").replace("&", "§") : getConfig().getString("ReturnMsgWhenFalse").replace("&", "§");
+        return getRDatabase().isInfected(pName) ? getConfig().getString("ultimatevirus_isInfected.ReturnMsgWhenTrue").replace("&", "§") : getConfig().getString("ultimatevirus_isInfected.ReturnMsgWhenFalse").replace("&", "§");
     }
+    public String infectedTitleReturnMsg(String pName){
+        return getRDatabase().isInfected(pName) ? getConfig().getString("ultimatevirus_infectedTitle.ReturnMsgWhenTrue").replace("&", "§") : getConfig().getString("ultimatevirus_infectedTitle.ReturnMsgWhenFalse").replace("&", "§");
+    }
+
     public void maskChecks(Player p, int maskDmg){
-        String maskName = getConfig().getString("MaskDisplayName");
         boolean msgOnMaskHit = getConfig().getBoolean("MsgOnMaskHit");
         int hpStartWarnings = getConfig().getInt("MaskLowHpWarnings");
 
@@ -303,7 +310,7 @@ public final class Ultimatevirus extends JavaPlugin {
                 Bukkit.getConsoleSender().sendMessage("Checking item " + i);
             ItemStack item = inv.getItem(i);
             if(item != null){
-                if(item.getType() == Material.LEATHER_HELMET && item.getItemMeta().getDisplayName().equals(maskName.replace("&", "§"))){
+                if(item.isSimilar(MaskCMD.getMask())){
                     // Checking mask durability: if it is negative, destroy it
                     if(item.getDurability() < item.getType().getMaxDurability()-maskDmg){
                         item.setDurability((short)(item.getDurability()+maskDmg));

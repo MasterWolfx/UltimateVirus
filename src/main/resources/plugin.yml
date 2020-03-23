@@ -8,4 +8,4 @@ softdepend: [PlaceholderAPI]
 commands:
   virus:
     description: Display all the plugin commands.
-    aliases: [ultimatevirus, uv]
+    aliases: [ultimatevirus, uv, v]

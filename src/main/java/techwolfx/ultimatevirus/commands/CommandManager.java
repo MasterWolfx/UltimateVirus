@@ -14,12 +14,13 @@ public class CommandManager implements CommandExecutor {
 
     // Constructor
     public CommandManager(){
-        subCommands.add(new ReloadCMD());
         subCommands.add(new MaskCMD());
         subCommands.add(new VaxinCMD());
         subCommands.add(new CheckInfectionCMD());
+        subCommands.add(new InfectedListCMD());
         subCommands.add(new InfectCMD());
         subCommands.add(new RecoverCMD());
+        subCommands.add(new ReloadCMD());
     }
 
     @Override

@@ -27,9 +27,9 @@ InfectionSpreadDelay: 60
 # The chance that a player has of catching a virus (from 0(%) to 100(%)).
 InfectionPercentage: 40
 
-# If enabled a broadcast warning will be sent every time the infection spreads.
 # You can customize the msg in the lang.yml file.
 BroadcastOnPlayerInfection: false
+BroadcastOnPlayerCure: false
 
 # Every time a player avoids a virus some "OnlinePoints" are added to his stats,
 # the more OnlinePoints he has the more chance he has to catch a virus next time.
@@ -68,9 +68,9 @@ InfectionParticleType: SLIME
 EnablePotionEffectsWhenInfected: true
 # You can find a list of PotionEffectTypes here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
 # NOTE: Make sure that the potion effects you choose are supported in your server version.
-# Add as many effects as you wish. FORMAT: PotionEffectType#Level
+# Add as many effects as you wish. FORMAT: PotionEffectType#Level#Chance (chance must be integer number)
 PotionEffectsWhenInfected:
-  - CONFUSION#3
+  - CONFUSION#3#100
 # Duration in seconds
 PotionEffectsDuration: 10
 
@@ -106,12 +106,21 @@ MaskDmgOnInfectedMobHit: 5
 # Other settings #
 ##################
 
+InfectedListMsg:
+  Header: "&4&nInfected List &7(%total%)"
+  EachLine: "&c&l* &7%player_name%"
+
 # Custom Placeholder: %ultimatevirus_isInfected%
 # You can choose the message that this placeholder is going to return
 # This placeholder can be used inside lang.yml (MsgCheckVirus & MsgCheckVirusOthers) and is supported by any other plugin
 # that supports PlaceholderAPI.
-ReturnMsgWhenTrue: "yes"
-ReturnMsgWhenFalse: "no"
+ultimatevirus_isInfected:
+  ReturnMsgWhenTrue: "yes"
+  ReturnMsgWhenFalse: "no"
+
+ultimatevirus_infectedTitle:
+  ReturnMsgWhenTrue: "Infected"
+  ReturnMsgWhenFalse: "Healthy"
 
 # Some worlds in which the virus will not spread.
 DisabledWorlds:

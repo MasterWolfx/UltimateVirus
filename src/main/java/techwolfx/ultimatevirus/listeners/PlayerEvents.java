@@ -14,6 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import techwolfx.ultimatevirus.Ultimatevirus;
+import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
+
 import java.util.List;
 import java.util.Random;
 
@@ -29,9 +31,8 @@ public class PlayerEvents implements Listener {
     @EventHandler
     public void onDrinkPotion(PlayerItemConsumeEvent e){
         ItemStack item = e.getItem();
-        String vaxinName = Ultimatevirus.getInstance().getConfig().getString("VaxinDisplayName").replace("&", "§");
         try{
-            if(item.getType() == Material.POTION && item.getItemMeta().getDisplayName().equals(vaxinName)) {
+            if(item.isSimilar(VaxinCMD.getVaxin())) {
                 Player p = e.getPlayer();
 
                 if( Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) ){
@@ -65,10 +66,13 @@ public class PlayerEvents implements Listener {
                         try {
                             effect = PotionEffectType.getByName(splittedEffect[0]);
                         } catch (Exception ex) {
-                            Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] One of your PotionEffectsWhenInfected was not recognized :(");
+                            Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] Potion effect called: "+splittedEffect[0]+" can't be found.");
                             continue;
                         }
-                        p.addPotionEffect(new PotionEffect(effect, time*20, Integer.parseInt(splittedEffect[1])-1));
+
+                        if(rand.nextInt(100) <= Integer.parseInt(splittedEffect[2]) ){
+                            p.addPotionEffect(new PotionEffect(effect, time*20, Integer.parseInt(splittedEffect[1])-1));
+                        }
                     }
                 }
             }
@@ -79,7 +83,7 @@ public class PlayerEvents implements Listener {
 
                 if(Bukkit.getBukkitVersion().contains("1.8")){
                     Effect particle = Effect.valueOf(Ultimatevirus.getInstance().getConfig().getString("InfectionParticleType"));
-                    p.getWorld().playEffect(p.getLocation(), particle, 50, 5);
+                    p.getWorld().playEffect(p.getLocation(), particle, 50, 15);
 
                     // Editable player location: new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())
                 } else {
@@ -88,93 +92,5 @@ public class PlayerEvents implements Listener {
                 }
             }
         }
-    }
-
-    @EventHandler
-    public void onMobHit(EntityDamageByEntityEvent e){
-        boolean mobInfection = Ultimatevirus.getInstance().getConfig().getBoolean("EnableMobInfection");
-        if(!mobInfection){
-            return;
-        }
-
-        Entity damager = e.getDamager();
-        Entity damaged = e.getEntity();
-
-        if(damager instanceof Monster && damaged instanceof Player){
-
-            List<String> enabledMobs = Ultimatevirus.getInstance().getConfig().getStringList("MobTypes");
-            String customName = Ultimatevirus.getInstance().getConfig().getString("CustomMobName").replace("&", "§").replace("%mob_type%", capitalizeMobTypeName( damager.getType().getName() ));
-            boolean goAhead = false;
-            for (String mob : enabledMobs){
-                // Check if the mob has the right custom name
-                if(damager.getType() == EntityType.fromName(mob.toUpperCase()) && damager.getCustomName() != null){
-                    if(damager.getCustomName().equals(customName)){
-                        goAhead = true;
-                        break;
-                    }
-                }
-            }
-            if(goAhead){
-                Player p = (Player) damaged;
-                if(p.hasPermission("ultimatevirus.bypass")){
-                    return;
-                }
-                int maskDmg = Ultimatevirus.getInstance().getConfig().getInt("MaskDmgOnInfectedMobHit");
-                p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
-                Ultimatevirus.getInstance().maskChecks(p, maskDmg);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onMobSpawn(CreatureSpawnEvent e){
-        boolean mobInfection = Ultimatevirus.getInstance().getConfig().getBoolean("EnableMobInfection");
-        if(!mobInfection){
-            return;
-        }
-        if (!(e.getEntity() instanceof Monster)) {
-            return;
-        }
-
-        // Check if the mob is in a disabled world
-        List<String> disabledWorlds = Ultimatevirus.getInstance().getConfig().getStringList("DisabledWorlds");
-        if (disabledWorlds.size() != 0) {
-            for (String world : disabledWorlds) {
-                if (e.getEntity().getWorld().getName().equals(world)) {
-                    return;
-                }
-            }
-        }
-
-        // Check if the mob spawned is between the enabled mobs
-        List<String> enabledMobs = Ultimatevirus.getInstance().getConfig().getStringList("MobTypes");
-        boolean goAhead = false;
-
-        for (String mob : enabledMobs){
-            EntityType mobType = EntityType.fromName(mob.toUpperCase());
-            if(e.getEntityType() == mobType){
-                goAhead = true;
-                break;
-            }
-        }
-        if(!goAhead){
-            return;
-        }
-
-        String customName = Ultimatevirus.getInstance().getConfig().getString("CustomMobName");
-
-        if (e.getEntity().getCustomName() == null) {
-            Random rand = new Random();
-            int spreadChance = Ultimatevirus.getInstance().getConfig().getInt("MobInfectionSpreadChance");
-            int result = rand.nextInt(100);
-            if( result <= spreadChance ){
-
-                e.getEntity().setCustomName(customName.replace("&", "§").replace("%mob_type%", capitalizeMobTypeName( e.getEntity().getType().getName() ) ) );
-            }
-        }
-    }
-
-    private String capitalizeMobTypeName(String s){
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }

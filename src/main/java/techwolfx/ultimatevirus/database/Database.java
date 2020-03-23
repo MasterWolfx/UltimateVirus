@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.bukkit.entity.Player;
@@ -85,16 +88,15 @@ public abstract class Database {
     public boolean isPlayerRegistered(String player){
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
+        ResultSet rs;
         try {
             conn = getSQLConnection();
-            //ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '"+player+"';");
             ps = conn.prepareStatement("SELECT player FROM " + table +";");
 
             rs = ps.executeQuery();
             while(rs.next()){
-                if(rs.getString("player").equalsIgnoreCase(player)){ // Tell database to search for the player you sent into the method. e.g getTokens(sam) It will look for sam.
-                    return true; // Return the players amount of kills. If you wanted to get total (just a random number for an example for you guys) You would change this to total!
+                if(rs.getString("player").equalsIgnoreCase(player)){
+                    return true;
                 }
             }
         } catch (SQLException ex) {
@@ -117,13 +119,6 @@ public abstract class Database {
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            /*
-            UPDATE table
-            SET infected = 1,
-            column_2 = new_value_2
-            WHERE
-            player = player
-             */
 
             ps = conn.prepareStatement("UPDATE " + table + " SET infected = '" + boolToInt(infected) + "' WHERE player = '" + player.getName() + "';");
             ps.executeUpdate();
@@ -230,6 +225,35 @@ public abstract class Database {
         return 0;
     }
 
+    public List<String> getInfected() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE infected = 1;");
+
+            rs = ps.executeQuery();
+            List<String> players = new ArrayList<>();
+            while(rs.next()){
+                players.add(rs.getString("player"));
+            }
+            players.sort(Comparator.comparing( String::toString ));
+            return players;
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return null;
+    }
 
     // Useful methods to convert bool to int and the other way around
     private int boolToInt(boolean x){
