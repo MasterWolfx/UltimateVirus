@@ -28,6 +28,7 @@ public class CommandManager implements CommandExecutor {
 
         // If the command does not comprise a subcommand or if the subcommand is help
         if(args.length == 0 || args[0].equalsIgnoreCase("help")){
+            if(!sender.hasPermission("ultimatevirus.help"))
             sender.sendMessage("§8§m---------------§a§o UltimateVirus §8§m---------------");
             for(SubCommand cmd : subCommands){
                 sender.sendMessage("§a" + cmd.getSyntax() + " §8| §7" + cmd.getDesc());

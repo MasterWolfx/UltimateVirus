@@ -143,7 +143,7 @@ public abstract class Database {
         ResultSet rs;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM " + table + ";");
+            ps = conn.prepareStatement("SELECT player, infected FROM " + table + ";");
 
             rs = ps.executeQuery();
             while(rs.next()){

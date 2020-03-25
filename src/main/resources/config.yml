@@ -110,9 +110,7 @@ InfectedListMsg:
   Header: "&4&nInfected List &7(%total%)"
   EachLine: "&c&l* &7%player_name%"
 
-# Custom Placeholder: %ultimatevirus_isInfected%
-# You can choose the message that this placeholder is going to return
-# This placeholder can be used inside lang.yml (MsgCheckVirus & MsgCheckVirusOthers) and is supported by any other plugin
+# This placeholders can be used inside lang.yml (MsgCheckVirus & MsgCheckVirusOthers) and is supported by any other plugin
 # that supports PlaceholderAPI.
 ultimatevirus_isInfected:
   ReturnMsgWhenTrue: "yes"

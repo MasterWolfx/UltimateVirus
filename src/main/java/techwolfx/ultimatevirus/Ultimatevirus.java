@@ -18,7 +18,7 @@ import techwolfx.ultimatevirus.database.SQLite;
 import techwolfx.ultimatevirus.files.Language;
 import techwolfx.ultimatevirus.listeners.MobEvents;
 import techwolfx.ultimatevirus.listeners.PlayerEvents;
-import techwolfx.ultimatevirus.placeholders.IsInfectedPlaceholder;
+import techwolfx.ultimatevirus.placeholders.CustomPlaceholders;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,18 +54,18 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.get().addDefault("TitleOnMaskBreak", "&c&nWarning");
         Language.get().addDefault("SubtitleOnMaskBreak", "&4Mask broken!");
 
-        Language.get().addDefault("MsgOnGiveMask", "&2You were given an AntiVirus Mask.");
-        Language.get().addDefault("MsgOnGiveVaxin", "&bYou were given a Vaxin.");
+        Language.get().addDefault("MsgOnGiveMask", "&a&l(!) &7You were given an &aAntiVirus Mask&7.");
+        Language.get().addDefault("MsgOnGiveVaxin", "&a&l(!) &7You were given a &bVaxin&7.");
 
         Language.get().addDefault("MsgOnMaskHit", "&a&l(!) &aYour mask saved you from a virus!");
-        Language.get().addDefault("MsgOnRecover", "&aYou recovered yourself from the virus!");
+        Language.get().addDefault("MsgOnRecover", "&a&l(!) &aYou recovered from the virus!");
 
-        Language.get().addDefault("MsgCheckVirus", "&cInfected: &f%ultimatevirus_isInfected%");
-        Language.get().addDefault("MsgCheckVirusOthers", "&cInfected (%target%): &f%ultimatevirus_isInfected%");
-        Language.get().addDefault("MsgHitByInfectedMob", "&cAn infected mob as hitted you! (-%mask_dmg% HP to your mask)");
-        Language.get().addDefault("ErrorMsgDrinkVaxin", "&cYou can't drink this, you are not infected!");
-        Language.get().addDefault("BroadcastOnPlayerInfection", "&4The health department confirms a new case of the virus. %player% is now infected.");
-        Language.get().addDefault("BroadcastOnPlayerCure", "&2The health department announces that %player% recovered from the virus.");
+        Language.get().addDefault("MsgCheckVirus", "&8[&2UV&8] &cInfected: &7%ultimatevirus_isInfected%");
+        Language.get().addDefault("MsgCheckVirusOthers", "&8[&2UV&8] &cInfected &e(%target%)&c: &7%ultimatevirus_isInfected%");
+        Language.get().addDefault("MsgHitByInfectedMob", "&c&l(!) &cAn infected mob as hitted you! (-%mask_dmg% HP to your mask)");
+        Language.get().addDefault("ErrorMsgDrinkVaxin", "&c&l(!) &7You can't drink this, you are not infected!");
+        Language.get().addDefault("BroadcastOnPlayerInfection", "&8[&fNEWS&8] &4The health department confirms a new case of the virus. %player% is now infected.");
+        Language.get().addDefault("BroadcastOnPlayerCure", "&8[&fNEWS&8] &2The health department announces that %player% recovered from the virus.");
 
         Language.get().options().copyDefaults(true);
         Language.save();
@@ -74,7 +74,8 @@ public final class Ultimatevirus extends JavaPlugin {
         return Language.get().getString(s).replace("&", "§");
     }
 
-    public IsInfectedPlaceholder myPlaceholder = null;
+    // Placeholders
+    public CustomPlaceholders myPlaceholder = null;
 
     // Enable the plugin
     @Override
@@ -102,7 +103,7 @@ public final class Ultimatevirus extends JavaPlugin {
         // Check if PlaceholderApi is enabled, and hook it
         if(Ultimatevirus.getInstance().getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
             Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Hooked PlaceholderAPI.");
-            myPlaceholder = new IsInfectedPlaceholder(this);
+            myPlaceholder = new CustomPlaceholders(this);
         } else {
             //throw new RuntimeException("§cCould not find PlaceholderAPI, some commands will not work properly.");
             Bukkit.getConsoleSender().sendMessage("§cCould not find PlaceholderAPI, some commands will not work properly.");
