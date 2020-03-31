@@ -9,3 +9,27 @@ commands:
   virus:
     description: Display all the plugin commands.
     aliases: [ultimatevirus, uv, v]
+
+permissions:
+  ultimatevirus.help:
+    default: not op
+  ultimatevirus.bypass:
+    default: op
+  ultimatevirus.check:
+    default: not op
+  ultimatevirus.checkothers:
+    default: op
+  ultimatevirus.infectedlist:
+    default: not op
+  ultimatevirus.infect:
+    default: op
+  ultimatevirus.recover:
+    default: op
+  ultimatevirus.sethealth:
+    default: op
+  ultimatevirus.mask:
+    default: op
+  ultimatevirus.vaxin:
+    default: op
+  ultimatevirus.reload:
+    default: op

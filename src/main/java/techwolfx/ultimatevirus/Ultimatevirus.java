@@ -60,12 +60,14 @@ public final class Ultimatevirus extends JavaPlugin {
         Language.get().addDefault("MsgOnMaskHit", "&a&l(!) &aYour mask saved you from a virus!");
         Language.get().addDefault("MsgOnRecover", "&a&l(!) &aYou recovered from the virus!");
 
-        Language.get().addDefault("MsgCheckVirus", "&8[&2UV&8] &cInfected: &7%ultimatevirus_isInfected%");
-        Language.get().addDefault("MsgCheckVirusOthers", "&8[&2UV&8] &cInfected &e(%target%)&c: &7%ultimatevirus_isInfected%");
-        Language.get().addDefault("MsgHitByInfectedMob", "&c&l(!) &cAn infected mob as hitted you! (-%mask_dmg% HP to your mask)");
+        Language.get().addDefault("MsgCheckVirus", "&c&l* &cInfected: &7%ultimatevirus_isInfected%");
+        Language.get().addDefault("MsgCheckVirusOthers", "&c&l* &cInfected &e(%target%)&c: &7%ultimatevirus_isInfected%");
+        Language.get().addDefault("MsgHitByInfectedMob", "&c&l(!) &cAn infected mob as hitted you! &e(-%mask_dmg% HP to your mask)");
         Language.get().addDefault("ErrorMsgDrinkVaxin", "&c&l(!) &7You can't drink this, you are not infected!");
         Language.get().addDefault("BroadcastOnPlayerInfection", "&8[&fNEWS&8] &4The health department confirms a new case of the virus. %player% is now infected.");
         Language.get().addDefault("BroadcastOnPlayerCure", "&8[&fNEWS&8] &2The health department announces that %player% recovered from the virus.");
+        Language.get().addDefault("MsgNoInfectedInsideList", "&a&l(!) &aNo player is infected at the moment.");
+        Language.get().addDefault("MsgOnSetHealth", "&d&l(!) &dSet health of &f%player%&d to &f%health%&d.");
 
         Language.get().options().copyDefaults(true);
         Language.save();

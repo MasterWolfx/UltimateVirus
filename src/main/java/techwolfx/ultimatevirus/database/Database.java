@@ -17,7 +17,6 @@ public abstract class Database {
     Connection connection;
     // The name of the table we created back in SQLite class.
     public String table = "player_infos";
-    public int tokens = 0;
     public Database(Ultimatevirus instance){
         plugin = instance;
     }
@@ -69,7 +68,6 @@ public abstract class Database {
             // Tokens from another plugin :/
             ps.setInt(4, points);
             ps.executeUpdate();
-            return;
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
         } finally {
@@ -82,7 +80,6 @@ public abstract class Database {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
             }
         }
-        return;
     }
 
     public boolean isPlayerRegistered(String player){
@@ -122,7 +119,6 @@ public abstract class Database {
 
             ps = conn.prepareStatement("UPDATE " + table + " SET infected = '" + boolToInt(infected) + "' WHERE player = '" + player.getName() + "';");
             ps.executeUpdate();
-            return;
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
         } finally {
@@ -135,7 +131,6 @@ public abstract class Database {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
             }
         }
-        return;
     }
     public boolean isInfected(String pName) {
         Connection conn = null;
@@ -181,7 +176,6 @@ public abstract class Database {
 
             ps = conn.prepareStatement("UPDATE " + table + " SET online_points = '" + points + "' WHERE player = '" + player.getName() + "';");
             ps.executeUpdate();
-            return;
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
         } finally {
@@ -194,7 +188,6 @@ public abstract class Database {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
             }
         }
-        return;
     }
     public int getPoints(Player player) {
         Connection conn = null;
@@ -202,7 +195,7 @@ public abstract class Database {
         ResultSet rs;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE player = '" + player.getName() + "';");
+            ps = conn.prepareStatement("SELECT player,online_points FROM " + table + " WHERE player = '" + player.getName() + "';");
 
             rs = ps.executeQuery();
             while(rs.next()){
@@ -231,7 +224,7 @@ public abstract class Database {
         ResultSet rs;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT * FROM " + table + " WHERE infected = 1;");
+            ps = conn.prepareStatement("SELECT player,infected FROM " + table + " WHERE infected = 1;");
 
             rs = ps.executeQuery();
             List<String> players = new ArrayList<>();

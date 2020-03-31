@@ -31,6 +31,12 @@ public class CheckInfectionCMD extends SubCommand {
             case 1:
                 if(sender instanceof Player){
                     Player p = (Player) sender;
+
+                    if(!p.hasPermission("ultimatevirus.check")){
+                        invalidPermission(p);
+                        break;
+                    }
+
                     if(Ultimatevirus.getInstance().myPlaceholder != null){
                         String msg = (Ultimatevirus.getInstance().getLangMsg("MsgCheckVirus"));
                         p.sendMessage(PlaceholderAPI.setPlaceholders(p, msg));

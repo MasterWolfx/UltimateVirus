@@ -1,14 +1,9 @@
 package techwolfx.ultimatevirus.commands.subcommands;
 
-import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
-
-import java.awt.*;
 import java.util.List;
 
 public class InfectedListCMD extends SubCommand {
@@ -38,7 +33,7 @@ public class InfectedListCMD extends SubCommand {
         }
         List<String> infectedList = Ultimatevirus.getInstance().getRDatabase().getInfected();
         if (infectedList.size() < 1){
-            sender.sendMessage("§cNo players are infected right now.");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Ultimatevirus.getInstance().getLangMsg("MsgNoInfectedInsideList")));
             return;
         }
 
