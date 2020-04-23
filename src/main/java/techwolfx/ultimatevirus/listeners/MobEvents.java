@@ -8,12 +8,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import techwolfx.ultimatevirus.utils.MainProcess;
 import techwolfx.ultimatevirus.Ultimatevirus;
-
+import techwolfx.ultimatevirus.files.Language;
 import java.util.List;
 import java.util.Random;
 
 public class MobEvents implements Listener {
+
     @EventHandler
     public void onMobHit(EntityDamageByEntityEvent e){
         boolean mobInfection = Ultimatevirus.getInstance().getConfig().getBoolean("EnableMobInfection");
@@ -44,8 +46,8 @@ public class MobEvents implements Listener {
                     return;
                 }
                 int maskDmg = Ultimatevirus.getInstance().getConfig().getInt("MaskDmgOnInfectedMobHit");
-                p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
-                Ultimatevirus.getInstance().maskChecks(p, maskDmg);
+                p.sendMessage(Language.getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
+                MainProcess.maskChecks(p, maskDmg);
             }
         }
     }

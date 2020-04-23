@@ -248,6 +248,35 @@ public abstract class Database {
         return null;
     }
 
+    public int getInfectedNumber() {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs;
+        try {
+            conn = getSQLConnection();
+            ps = conn.prepareStatement("SELECT player,infected FROM " + table + " WHERE infected = 1;");
+
+            rs = ps.executeQuery();
+            int infected = 0;
+            while(rs.next()){
+                infected++;
+            }
+            return infected;
+        } catch (SQLException ex) {
+            plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+                if (conn != null)
+                    conn.close();
+            } catch (SQLException ex) {
+                plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
+            }
+        }
+        return 0;
+    }
+
     // Useful methods to convert bool to int and the other way around
     private int boolToInt(boolean x){
         return x ? 1 : 0;

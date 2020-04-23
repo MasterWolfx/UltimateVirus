@@ -4,6 +4,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
+import techwolfx.ultimatevirus.files.Language;
+
 import java.util.List;
 
 public class InfectedListCMD extends SubCommand {
@@ -33,7 +35,7 @@ public class InfectedListCMD extends SubCommand {
         }
         List<String> infectedList = Ultimatevirus.getInstance().getRDatabase().getInfected();
         if (infectedList.size() < 1){
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Ultimatevirus.getInstance().getLangMsg("MsgNoInfectedInsideList")));
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', Language.getLangMsg("MsgNoInfectedInsideList")));
             return;
         }
 

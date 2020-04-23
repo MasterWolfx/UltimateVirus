@@ -35,6 +35,6 @@ public class ReloadCMD extends SubCommand {
 
         Ultimatevirus.getInstance().reloadConfig();
         Language.reload();
-        sender.sendMessage("§aUltimateVirus config reloaded.");
+        sender.sendMessage("§aUltimateVirus files reloaded.");
     }
 }

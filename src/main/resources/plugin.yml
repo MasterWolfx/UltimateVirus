@@ -12,15 +12,15 @@ commands:
 
 permissions:
   ultimatevirus.help:
-    default: not op
+    description: Allows the player to execute /virus help
   ultimatevirus.bypass:
     default: op
   ultimatevirus.check:
-    default: not op
+    description: Allows the player to execute /virus check
   ultimatevirus.checkothers:
     default: op
   ultimatevirus.infectedlist:
-    default: not op
+    description: Allows the player to execute /virus infected
   ultimatevirus.infect:
     default: op
   ultimatevirus.recover:

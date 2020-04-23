@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
+import techwolfx.ultimatevirus.files.Language;
 
 public class SetHealthCMD extends SubCommand {
     @Override
@@ -35,7 +36,7 @@ public class SetHealthCMD extends SubCommand {
             try{
                 for(Player p : Bukkit.getOnlinePlayers()){
                     p.setMaxHealth(Double.parseDouble(args[2]));
-                    sender.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnSetHealth").replace("%player%", args[1]).replace("%health%", args[2]));
+                    sender.sendMessage(Language.getLangMsg("MsgOnSetHealth").replace("%player%", args[1]).replace("%health%", args[2]));
                 }
             } catch (Exception ex){
                 sender.sendMessage("§cAn error occured: player is offline or invalid health amount.");
@@ -45,7 +46,7 @@ public class SetHealthCMD extends SubCommand {
         try{
             Player p = Bukkit.getPlayer(args[1]);
             p.setMaxHealth(Double.parseDouble(args[2]));
-            sender.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnSetHealth").replace("%player%", args[1]).replace("%health%", args[2]));
+            sender.sendMessage(Language.getLangMsg("MsgOnSetHealth").replace("%player%", args[1]).replace("%health%", args[2]));
         } catch (Exception ex){
             sender.sendMessage("§cAn error occured: player is offline or invalid health amount.");
         }

@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
+import techwolfx.ultimatevirus.files.Language;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class VaxinCMD extends SubCommand {
         Inventory inv = p.getInventory();
 
         inv.addItem(getVaxin());
-        p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnGiveVaxin"));
+        p.sendMessage(Language.getLangMsg("MsgOnGiveVaxin"));
     }
 
     @Override

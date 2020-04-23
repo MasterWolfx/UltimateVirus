@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
+import techwolfx.ultimatevirus.utils.MainProcess;
 
 
 public class InfectCMD extends SubCommand {
@@ -38,7 +39,7 @@ public class InfectCMD extends SubCommand {
         if(!Ultimatevirus.getInstance().getRDatabase().isInfected(args[1])){
             try{
                 Player target = Bukkit.getPlayer(args[1]);
-                Ultimatevirus.getInstance().setInfected(target);
+                MainProcess.setInfected(target);
                 msgOnOnStatusChange(sender, target.getName());
             } catch (Exception exx){
                 invalidPlayer(sender);

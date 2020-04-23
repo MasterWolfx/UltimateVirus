@@ -1,7 +1,6 @@
 package techwolfx.ultimatevirus.database;
 
 import techwolfx.ultimatevirus.Ultimatevirus;
-
 import java.util.logging.Level;
 
 public class Error {

@@ -7,13 +7,15 @@ import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.Listener;
+import techwolfx.ultimatevirus.files.Language;
+import techwolfx.ultimatevirus.utils.MainProcess;
 
 public class CustomPlaceholders implements Listener {
 
-    private Ultimatevirus plugin;
+    //private Ultimatevirus plugin;
 
     public CustomPlaceholders(Ultimatevirus plugin){
-        this.plugin = plugin;
+        //this.plugin = plugin;
         registerPlaceholders();
         plugin.getServer().getPluginManager().registerEvents(this,plugin);
     }
@@ -26,10 +28,13 @@ public class CustomPlaceholders implements Listener {
                     return null;
                 }
                 if(params.equalsIgnoreCase("isInfected")){
-                    return plugin.isInfectedReturnMsg(p.getName());
+                    return MainProcess.isInfectedReturnMsg(p.getName());
                 }
                 if(params.equalsIgnoreCase("infectedTitle")){
-                    return plugin.infectedTitleReturnMsg(p.getName());
+                    return MainProcess.infectedTitleReturnMsg(p.getName());
+                }
+                if(params.equalsIgnoreCase("totalInfected")){
+                    return Integer.toString(MainProcess.getTotalInfected());
                 }
                 return null;
             }
@@ -40,10 +45,13 @@ public class CustomPlaceholders implements Listener {
                     return null;
                 }
                 if(params.equalsIgnoreCase("isInfected")){
-                    return plugin.isInfectedReturnMsg(p.getName());
+                    return MainProcess.isInfectedReturnMsg(p.getName());
                 }
                 if(params.equalsIgnoreCase("infectedTitle")){
-                    return plugin.infectedTitleReturnMsg(p.getName());
+                    return MainProcess.infectedTitleReturnMsg(p.getName());
+                }
+                if(params.equalsIgnoreCase("totalInfected")){
+                    return Integer.toString(MainProcess.getTotalInfected());
                 }
                 return null;
             }

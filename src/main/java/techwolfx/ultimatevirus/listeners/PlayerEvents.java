@@ -4,19 +4,17 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import techwolfx.ultimatevirus.utils.MainProcess;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
+import techwolfx.ultimatevirus.files.Language;
 
-import java.util.List;
 import java.util.Random;
 
 public class PlayerEvents implements Listener {
@@ -36,9 +34,9 @@ public class PlayerEvents implements Listener {
                 Player p = e.getPlayer();
 
                 if( Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) ){
-                    Ultimatevirus.getInstance().setHealthy(p);
+                    MainProcess.setHealthy(p);
                 } else {
-                    p.sendMessage(Ultimatevirus.getInstance().getLangMsg("ErrorMsgDrinkVaxin"));
+                    p.sendMessage(Language.getLangMsg("ErrorMsgDrinkVaxin"));
                     e.setCancelled(true);
                 }
             }
@@ -66,11 +64,17 @@ public class PlayerEvents implements Listener {
                         try {
                             effect = PotionEffectType.getByName(splittedEffect[0]);
                         } catch (Exception ex) {
-                            Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] Potion effect called: "+splittedEffect[0]+" can't be found.");
+                            Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] Potion effect called: "+splittedEffect[0]+" can't be found:");
+                            Bukkit.getConsoleSender().sendMessage(ex.getMessage());
                             continue;
                         }
-
-                        if(rand.nextInt(100) <= Integer.parseInt(splittedEffect[2]) ){
+                        int prob;
+                        if(splittedEffect.length == 2){
+                            prob = 100;
+                        } else {
+                            prob = Integer.parseInt(splittedEffect[2]);
+                        }
+                        if(rand.nextInt(100) <=  prob){
                             p.addPotionEffect(new PotionEffect(effect, time*20, Integer.parseInt(splittedEffect[1])-1));
                         }
                     }
@@ -81,7 +85,7 @@ public class PlayerEvents implements Listener {
             //
             if(Ultimatevirus.getInstance().getConfig().getBoolean("ParticlesWhenInfected")){
 
-                if(Bukkit.getBukkitVersion().contains("1.8")){
+                if(Ultimatevirus.getInstance().getVersion() < 9){
                     Effect particle = Effect.valueOf(Ultimatevirus.getInstance().getConfig().getString("InfectionParticleType"));
                     p.getWorld().playEffect(p.getLocation(), particle, 50, 15);
 

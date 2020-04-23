@@ -68,7 +68,7 @@ InfectionParticleType: SLIME
 EnablePotionEffectsWhenInfected: true
 # You can find a list of PotionEffectTypes here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html
 # NOTE: Make sure that the potion effects you choose are supported in your server version.
-# Add as many effects as you wish. FORMAT: PotionEffectType#Level#Chance (chance must be integer number)
+# Add as many effects as you wish. FORMAT: PotionEffectType#Level#Chance (chance must be an integer number)
 PotionEffectsWhenInfected:
   - CONFUSION#3#100
 # Duration in seconds
@@ -110,7 +110,7 @@ InfectedListMsg:
   Header: "&4&nInfected List &7(%total%)"
   EachLine: "&c&l* &7%player_name%"
 
-# This placeholders can be used inside lang.yml (MsgCheckVirus & MsgCheckVirusOthers) and is supported by any other plugin
+# These placeholders can be used inside lang.yml (MsgCheckVirus & MsgCheckVirusOthers) and are supported by any other plugin
 # that supports PlaceholderAPI.
 ultimatevirus_isInfected:
   ReturnMsgWhenTrue: "yes"

@@ -12,6 +12,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
+import techwolfx.ultimatevirus.files.Language;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +43,7 @@ public class MaskCMD extends SubCommand {
     private void giveMask(Player p){
         Inventory inv = p.getInventory();
         inv.addItem(getMask());
-        p.sendMessage(Ultimatevirus.getInstance().getLangMsg("MsgOnGiveMask"));
+        p.sendMessage(Language.getLangMsg("MsgOnGiveMask"));
     }
 
     @Override
