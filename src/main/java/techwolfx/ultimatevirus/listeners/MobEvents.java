@@ -40,13 +40,26 @@ public class MobEvents implements Listener {
                     }
                 }
             }
+            // The mob has the right custom name:
             if(goAhead){
                 Player p = (Player) damaged;
                 if(p.hasPermission("ultimatevirus.bypass")){
                     return;
                 }
                 int maskDmg = Ultimatevirus.getInstance().getConfig().getInt("MaskDmgOnInfectedMobHit");
-                p.sendMessage(Language.getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
+                // Send hit message only if the player is not infected
+                if(Ultimatevirus.getInstance().getConfig().getBoolean("PreventSpamInfectedMobHit")){
+                    if(!Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName())){
+                        p.sendMessage(Language.getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
+                    }
+                } else {
+                    if(MainProcess.hasMask(p)){
+                        p.sendMessage(Language.getLangMsg("MsgHitByInfectedMobWithMask").replace("%mask_dmg%", Integer.toString(maskDmg)));
+                    } else {
+                        p.sendMessage(Language.getLangMsg("MsgHitByInfectedMob"));
+                    }
+                }
+
                 MainProcess.maskChecks(p, maskDmg);
             }
         }
@@ -90,13 +103,15 @@ public class MobEvents implements Listener {
         String customName = Ultimatevirus.getInstance().getConfig().getString("CustomMobName");
 
         if (e.getEntity().getCustomName() == null) {
+
             Random rand = new Random();
             int spreadChance = Ultimatevirus.getInstance().getConfig().getInt("MobInfectionSpreadChance");
             int result = rand.nextInt(100);
-            if( result <= spreadChance ){
 
+            if ( result <= spreadChance ){
                 e.getEntity().setCustomName(customName.replace("&", "§").replace("%mob_type%", capitalizeMobTypeName( e.getEntity().getType().getName() ) ) );
             }
+
         }
     }
 

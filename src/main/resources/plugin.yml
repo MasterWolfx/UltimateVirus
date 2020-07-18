@@ -11,25 +11,33 @@ commands:
     aliases: [ultimatevirus, uv, v]
 
 permissions:
+  ultimatevirus.bypass:
+    description: Prevent virus infection
+    default: op
   ultimatevirus.help:
     description: Allows the player to execute /virus help
-  ultimatevirus.bypass:
-    default: op
   ultimatevirus.check:
     description: Allows the player to execute /virus check
-  ultimatevirus.checkothers:
-    default: op
   ultimatevirus.infectedlist:
     description: Allows the player to execute /virus infected
+  ultimatevirus.checkothers:
+    description: Allows the player to execute /virus check [player]
+    default: op
   ultimatevirus.infect:
+    description: Allows the player to execute /virus infect [player]
     default: op
   ultimatevirus.recover:
+    description: Allows the player to execute /virus recover [player]
     default: op
   ultimatevirus.sethealth:
+    description: Allows the player to execute /virus sethealth [player:*]
     default: op
   ultimatevirus.mask:
+    description: Allows the player to execute /virus mask [player]
     default: op
   ultimatevirus.vaxin:
+    description: Allows the player to execute /virus vaxin [player]
     default: op
   ultimatevirus.reload:
+    description: Allows the player to execute /virus reload
     default: op

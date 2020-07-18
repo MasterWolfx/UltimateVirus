@@ -4,6 +4,7 @@ import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -41,6 +42,16 @@ public class PlayerEvents implements Listener {
                 }
             }
         } catch (Exception ignored){ }
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent e){
+
+        Player p = e.getEntity();
+        if(Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) && Ultimatevirus.getInstance().getConfig().getBoolean("RemoveVirusOnPlayerDeath")){
+            Ultimatevirus.getInstance().getRDatabase().setInfected(p, false);
+        }
+
     }
 
     @EventHandler

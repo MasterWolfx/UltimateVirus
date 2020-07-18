@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
 import techwolfx.ultimatevirus.files.Language;
-import techwolfx.ultimatevirus.utils.MainProcess;
+import techwolfx.ultimatevirus.utils.PlaceholderUtils;
 
 public class CheckInfectionCMD extends SubCommand {
 
@@ -44,7 +44,7 @@ public class CheckInfectionCMD extends SubCommand {
                         p.sendMessage(PlaceholderAPI.setPlaceholders(p, msg));
                         return;
                     } else {
-                        sender.sendMessage(Language.getLangMsg("MsgCheckVirus").replace("%ultimatevirus_isInfected%", MainProcess.isInfectedReturnMsg(p.getName())));
+                        sender.sendMessage(Language.getLangMsg("MsgCheckVirus").replace("%ultimatevirus_isInfected%", PlaceholderUtils.isInfectedReturnMsg(p.getName())));
                     }
                 } else {
                     sender.sendMessage("§cThis command can only be executed by a player.");
@@ -62,6 +62,7 @@ public class CheckInfectionCMD extends SubCommand {
                 if(Ultimatevirus.getInstance().getRDatabase().isPlayerRegistered(args[1])){
                     if(Ultimatevirus.getInstance().myPlaceholder != null){
                         String msg = (Language.getLangMsg("MsgCheckVirusOthers").replace("%target%", args[1]));
+
                         if(Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(args[1]))){
                             sender.sendMessage(PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(args[1]), msg));
                         } else {
@@ -69,7 +70,7 @@ public class CheckInfectionCMD extends SubCommand {
                         }
 
                     } else{
-                        sender.sendMessage(Language.getLangMsg("MsgCheckVirusOthers").replace("%target%", args[1]).replace("%ultimatevirus_isInfected%", MainProcess.isInfectedReturnMsg(args[1])));
+                        sender.sendMessage(Language.getLangMsg("MsgCheckVirusOthers").replace("%target%", args[1]).replace("%ultimatevirus_isInfected%", PlaceholderUtils.isInfectedReturnMsg(args[1])));
                     }
                 } else {
                     sender.sendMessage("§cThis player is not registered in database.");

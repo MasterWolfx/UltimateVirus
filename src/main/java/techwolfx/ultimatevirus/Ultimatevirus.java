@@ -18,6 +18,7 @@ import techwolfx.ultimatevirus.listeners.PlayerEvents;
 import techwolfx.ultimatevirus.placeholders.CustomPlaceholders;
 import techwolfx.ultimatevirus.utils.MainProcess;
 import techwolfx.ultimatevirus.utils.VersionUtils;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -47,12 +48,10 @@ public final class Ultimatevirus extends JavaPlugin {
     // Enable the plugin
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(new MobEvents(), this);
-        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
-        Objects.requireNonNull(getCommand("virus")).setExecutor(new CommandManager());
-        Objects.requireNonNull(getCommand("virus")).setTabCompleter(new CmdTabCompletion());
         instance = this;
         version = VersionUtils.getVersionNumber();
+
+        // Setup config.yml
         saveDefaultConfig();
 
         // Setup lang.yml
@@ -64,17 +63,23 @@ public final class Ultimatevirus extends JavaPlugin {
 
         // Enabling custom recipes
         if(getConfig().getBoolean("EnableMaskRecipe"))
-            maskRecipe();
+            loadMaskCrafting();
         if(getConfig().getBoolean("EnableVaxinRecipe"))
-            vaxinRecipe();
+            loadVaxinCrafting();
 
-        // Check if PlaceholderApi is enabled, and hook it
+        // Check if PlaceholderAPI is enabled, and hook it
         if(Ultimatevirus.getInstance().getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
             Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Hooked PlaceholderAPI.");
             myPlaceholder = new CustomPlaceholders(this);
         } else {
             Bukkit.getConsoleSender().sendMessage("§cCould not find PlaceholderAPI, some commands will not work properly.");
         }
+
+        // Register commands and events
+        getServer().getPluginManager().registerEvents(new MobEvents(), this);
+        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
+        Objects.requireNonNull(getCommand("virus")).setExecutor(new CommandManager());
+        Objects.requireNonNull(getCommand("virus")).setTabCompleter(new CmdTabCompletion());
 
         Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Plugin Enabled.");
 
@@ -83,48 +88,86 @@ public final class Ultimatevirus extends JavaPlugin {
         scheduler.scheduleSyncRepeatingTask(this, MainProcess::mainProcess, 0L, checkInterval*20);
     }
 
-    private void maskRecipe(){
+    private void loadMaskCrafting(){
+        List<String> pattern = getConfig().getStringList("custom-craftings.mask.pattern");
+        List<String> items = getConfig().getStringList("custom-craftings.mask.ingredients");
+
+        if(pattern.size() != 3){
+            Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] Mask crafting pattern is incorrect, ignoring it.");
+            return;
+        }
+
         ItemStack maskItem = MaskCMD.getMask();
         ShapedRecipe maskRecipe;
 
         if(version < 11){
             maskRecipe = new ShapedRecipe(maskItem);
         } else {
-            NamespacedKey key = new NamespacedKey(this, "virus_mask");
+            NamespacedKey key = new NamespacedKey(this, "virusMask");
             maskRecipe = new ShapedRecipe(key, maskItem);
         }
 
-        maskRecipe.shape("***","%%%","LLL");
+        maskRecipe.shape(pattern.get(0),pattern.get(1),pattern.get(2));
 
-        maskRecipe.setIngredient('*', Material.STRING);
-        maskRecipe.setIngredient('%', Material.PAPER);
-        maskRecipe.setIngredient('L', Material.LEATHER);
+        try {
+            for(String item : items){
+                String[] splittedItem = item.split(":");
+                char key = splittedItem[0].charAt(0);
+                if(key == 'X'){
+                    maskRecipe.setIngredient('X', Material.AIR);
+                } else {
+                    maskRecipe.setIngredient(key, Material.getMaterial(splittedItem[1]), Integer.parseInt(splittedItem[2]));
+                }
+            }
+        } catch (Exception ex){
+            Bukkit.getLogger().warning("An error occured while enabling custom Mask crafting: ");
+            ex.printStackTrace();
+            return;
+        }
 
         getServer().addRecipe(maskRecipe);
-        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Enabled custom Mask recipe.");
+        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Enabled custom Mask crafting.");
     }
 
-    private void vaxinRecipe(){
+    private void loadVaxinCrafting(){
+        List<String> pattern = getConfig().getStringList("custom-craftings.vaxin.pattern");
+        List<String> items = getConfig().getStringList("custom-craftings.vaxin.ingredients");
+
+        if(pattern.size() != 3){
+            Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] Vaxin crafting pattern is incorrect, ignoring it.");
+            return;
+        }
+
         ItemStack vaxinItem = VaxinCMD.getVaxin();
         ShapedRecipe vaxinRecipe;
 
         if(version < 11){
             vaxinRecipe = new ShapedRecipe(vaxinItem);
         } else {
-            NamespacedKey key = new NamespacedKey(this, "virus_vaxin");
+            NamespacedKey key = new NamespacedKey(this, "virusVaxin");
             vaxinRecipe = new ShapedRecipe(key, vaxinItem);
         }
 
-        vaxinRecipe.shape("ESW","SPS","RSB");
+        vaxinRecipe.shape(pattern.get(0),pattern.get(1),pattern.get(2));
 
-        vaxinRecipe.setIngredient('P', Material.POTION);
-        vaxinRecipe.setIngredient('E', Material.FERMENTED_SPIDER_EYE);
-        vaxinRecipe.setIngredient('S', Material.SUGAR);
-        vaxinRecipe.setIngredient('B', Material.BROWN_MUSHROOM);
-        vaxinRecipe.setIngredient('R', Material.RED_MUSHROOM);
-        vaxinRecipe.setIngredient('W', Material.EGG);
+        try{
+            for(String item : items){
+                String[] splittedItem = item.split(":");
+                char key = splittedItem[0].charAt(0);
+                if(key == 'X'){
+                    vaxinRecipe.setIngredient('X', Material.AIR);
+                } else {
+                    vaxinRecipe.setIngredient(key, Material.getMaterial(splittedItem[1]), Integer.parseInt(splittedItem[2]));
+                }
+            }
+        } catch (Exception ex){
+            Bukkit.getLogger().warning("An error occured while enabling custom Vaxin crafting: ");
+            ex.printStackTrace();
+            return;
+        }
 
         getServer().addRecipe(vaxinRecipe);
-        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Enabled custom Vaxin recipe.");
+        Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Enabled custom Vaxin crafting.");
     }
+
 }

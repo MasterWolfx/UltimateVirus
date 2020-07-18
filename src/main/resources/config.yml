@@ -5,7 +5,7 @@ Debug: false
 # Main Settings #
 #################
 
-# Items' display names and lores.
+# Items's display names and lores.
 MaskDisplayName: "&2AntiVirus Mask"
 MaskLore:
   - "&2&l* &7Protect yourself from virus."
@@ -27,10 +27,6 @@ InfectionSpreadDelay: 60
 # The chance that a player has of catching a virus (from 0(%) to 100(%)).
 InfectionPercentage: 40
 
-# You can customize the msg in the lang.yml file.
-BroadcastOnPlayerInfection: false
-BroadcastOnPlayerCure: false
-
 # Every time a player avoids a virus some "OnlinePoints" are added to his stats,
 # the more OnlinePoints he has the more chance he has to catch a virus next time.
 # These points will be added to the InfectionPercentage.
@@ -50,8 +46,21 @@ MsgOnMaskHit: false
 
 # Players can be infected only if their gamemode is set to survival
 InfectOnlyOnSurvivalGamemode: true
-# If enabled also OP players will catch the virus
+# If enabled, also OP players will catch the virus
 InfectOpPlayers: false
+
+# If enabled, when an infected player dies he will recover from the virus
+RemoveVirusOnPlayerDeath: false
+
+####################
+# Message settings #
+####################
+
+# NOTE: You can customize every message in the lang.yml file.
+BroadcastOnPlayerInfection: false
+BroadcastOnPlayerCure: false
+# If enabled, the message sent when an infected mob hits a player is sent only if the player is healthy
+PreventSpamInfectedMobHit: false
 
 ######################
 # Infection Settings #
@@ -74,7 +83,7 @@ PotionEffectsWhenInfected:
 # Duration in seconds
 PotionEffectsDuration: 10
 
-# Infection chance addition to catch a virus if a player is near an infected player (%).
+# Infection chance addition (%) to catch a virus if a player is near an infected player.
 # NOTE: If a player is near 2 infected players, "ChanceAdditionWhenNearInfected" is doubled.
 ChanceAdditionWhenNearInfected: 10
 
@@ -106,12 +115,9 @@ MaskDmgOnInfectedMobHit: 5
 # Other settings #
 ##################
 
-InfectedListMsg:
-  Header: "&4&nInfected List &7(%total%)"
-  EachLine: "&c&l* &7%player_name%"
-
 # These placeholders can be used inside lang.yml (MsgCheckVirus & MsgCheckVirusOthers) and are supported by any other plugin
 # that supports PlaceholderAPI.
+# Other placeholders: %ultimatevirus_totalInfected% (returns the amount of infected)
 ultimatevirus_isInfected:
   ReturnMsgWhenTrue: "yes"
   ReturnMsgWhenFalse: "no"
@@ -124,3 +130,32 @@ ultimatevirus_infectedTitle:
 DisabledWorlds:
   - world1
   - world2
+
+# NOTE: in order to apply crafting chances you must restart your server.
+custom-craftings:
+  mask:
+    pattern:
+      # IMPORTANT: X stands for Air (empty), DO NOT include X in the 'ingredients' below.
+      - 'SSS' #First row in the crafting table
+      - 'PPP' #Second row
+      - 'LLL' #Third row
+    ingredients:
+      # Format: LETTER:ITEM_TYPE:AMOUNT
+      # LETTER: can be any letter you want (SINGLE LETTER), just make sure it is different from the others used in this crafting.
+      # ITEM_TYPE: the item type associated to the letter.
+      # AMOUNT: item amount needed.
+      - 'S:STRING:1'
+      - 'P:PAPER:1'
+      - 'L:LEATHER:1'
+  vaxin:
+    pattern:
+      - 'FSE'
+      - 'SPS'
+      - 'RSB'
+    ingredients:
+      - 'S:SUGAR:1'
+      - 'R:RED_MUSHROOM:1'
+      - 'B:BROWN_MUSHROOM:1'
+      - 'E:EGG:1'
+      - 'F:FERMENTED_SPIDER_EYE:1'
+      - 'P:POTION:1'
