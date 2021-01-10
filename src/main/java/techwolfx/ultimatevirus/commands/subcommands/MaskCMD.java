@@ -1,49 +1,20 @@
 package techwolfx.ultimatevirus.commands.subcommands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
-import techwolfx.ultimatevirus.files.Language;
-
-import java.util.ArrayList;
-import java.util.List;
+import techwolfx.ultimatevirus.files.LanguageFile;
+import techwolfx.ultimatevirus.utils.UltimatevirusUtils;
 
 
 public class MaskCMD extends SubCommand {
 
-    public static ItemStack getMask(){
-        String maskName = Ultimatevirus.getInstance().getConfig().getString("MaskDisplayName").replace("&", "§");
-
-        ItemStack mask = new ItemStack(Material.LEATHER_HELMET, 1);
-        ItemMeta im = mask.getItemMeta();
-        im.setDisplayName(maskName);
-        im.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
-        im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-        List<String> lore = Ultimatevirus.getInstance().getConfig().getStringList("MaskLore");
-        List<String> newLore = new ArrayList<>();
-        for (String line : lore) {
-            newLore.add(ChatColor.translateAlternateColorCodes('&', line));
-        }
-        im.setLore(newLore);
-
-        mask.setItemMeta(im);
-        return mask;
-    }
-
     private void giveMask(Player p){
         Inventory inv = p.getInventory();
-        inv.addItem(getMask());
-        p.sendMessage(Language.getLangMsg("MsgOnGiveMask"));
+        inv.addItem(UltimatevirusUtils.getMask());
+        p.sendMessage(LanguageFile.getLangMsg("MsgOnGiveMask"));
     }
 
     @Override

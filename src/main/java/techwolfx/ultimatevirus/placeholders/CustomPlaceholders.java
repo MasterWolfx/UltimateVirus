@@ -1,56 +1,43 @@
 package techwolfx.ultimatevirus.placeholders;
 
-import me.clip.placeholderapi.PlaceholderAPI;
-import me.clip.placeholderapi.PlaceholderHook;
-import org.bukkit.entity.Player;
-import techwolfx.ultimatevirus.Ultimatevirus;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.event.Listener;
 import techwolfx.ultimatevirus.utils.PlaceholderUtils;
 
-public class CustomPlaceholders implements Listener {
+public class CustomPlaceholders extends PlaceholderExpansion {
 
-    public CustomPlaceholders(Ultimatevirus plugin){
-        registerPlaceholders();
-        plugin.getServer().getPluginManager().registerEvents(this,plugin);
+    @Override
+    public String onRequest(OfflinePlayer player, String identifier) {
+        if (identifier.equalsIgnoreCase("isInfected")) {
+            return PlaceholderUtils.isInfectedReturnMsg(player.getUniqueId());
+        }
+        if (identifier.equalsIgnoreCase("infectedTitle")) {
+            return PlaceholderUtils.infectedTitleReturnMsg(player.getUniqueId());
+        }
+        if (identifier.equalsIgnoreCase("totalInfected")) {
+            return Integer.toString(PlaceholderUtils.getTotalInfected());
+        }
+        return null;
     }
 
-    private void registerPlaceholders() {
-        PlaceholderAPI.registerPlaceholderHook("ultimatevirus", new PlaceholderHook() {
-
-            @Override
-            public String onRequest(OfflinePlayer p, String params) {
-                if(p == null){
-                    return null;
-                }
-                if(params.equalsIgnoreCase("isInfected")){
-                    return PlaceholderUtils.isInfectedReturnMsg(p.getName());
-                }
-                if(params.equalsIgnoreCase("infectedTitle")){
-                    return PlaceholderUtils.infectedTitleReturnMsg(p.getName());
-                }
-                if(params.equalsIgnoreCase("totalInfected")){
-                    return Integer.toString(PlaceholderUtils.getTotalInfected());
-                }
-                return null;
-            }
-
-            @Override
-            public String onPlaceholderRequest(Player p, String params) {
-                if(p == null){
-                    return null;
-                }
-                if(params.equalsIgnoreCase("isInfected")){
-                    return PlaceholderUtils.isInfectedReturnMsg(p.getName());
-                }
-                if(params.equalsIgnoreCase("infectedTitle")){
-                    return PlaceholderUtils.infectedTitleReturnMsg(p.getName());
-                }
-                if(params.equalsIgnoreCase("totalInfected")){
-                    return Integer.toString(PlaceholderUtils.getTotalInfected());
-                }
-                return null;
-            }
-        });
+    @Override
+    public boolean canRegister(){
+        return true;
     }
+
+    @Override
+    public String getIdentifier() {
+        return "ultimatevirus";
+    }
+
+    @Override
+    public String getAuthor() {
+        return "MasterWolfx";
+    }
+
+    @Override
+    public String getVersion() {
+        return "1.0";
+    }
+
 }

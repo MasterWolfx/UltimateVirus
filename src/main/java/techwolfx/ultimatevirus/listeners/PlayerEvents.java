@@ -13,17 +13,24 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import techwolfx.ultimatevirus.utils.MainProcess;
 import techwolfx.ultimatevirus.Ultimatevirus;
-import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
-import techwolfx.ultimatevirus.files.Language;
+import techwolfx.ultimatevirus.files.LanguageFile;
+import techwolfx.ultimatevirus.utils.UltimatevirusUtils;
 
 import java.util.Random;
 
 public class PlayerEvents implements Listener {
 
+    private final Ultimatevirus plugin;
+
+    public PlayerEvents(Ultimatevirus plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e){
-        if(!Ultimatevirus.getInstance().getRDatabase().isPlayerRegistered(e.getPlayer().getName())){
-            Ultimatevirus.getInstance().getRDatabase().setTokens(e.getPlayer(), e.getPlayer().getUniqueId(),false, 0);
+        Player p = e.getPlayer();
+        if (!plugin.getRDatabase().isPlayerRegistered(p.getUniqueId())) {
+            plugin.getRDatabase().setTokens(p, p.getUniqueId(),false, 0);
         }
     }
 
@@ -31,13 +38,13 @@ public class PlayerEvents implements Listener {
     public void onDrinkPotion(PlayerItemConsumeEvent e){
         ItemStack item = e.getItem();
         try{
-            if(item.isSimilar(VaxinCMD.getVaxin())) {
+            if(item.isSimilar(UltimatevirusUtils.getVaxin())) {
                 Player p = e.getPlayer();
 
-                if( Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) ){
-                    MainProcess.setHealthy(p);
+                if( plugin.getRDatabase().isInfected(p.getUniqueId()) ){
+                    MainProcess.setHealthy(p, true);
                 } else {
-                    p.sendMessage(Language.getLangMsg("ErrorMsgDrinkVaxin"));
+                    p.sendMessage(LanguageFile.getLangMsg("ErrorMsgDrinkVaxin"));
                     e.setCancelled(true);
                 }
             }
@@ -48,26 +55,25 @@ public class PlayerEvents implements Listener {
     public void onPlayerDeath(PlayerDeathEvent e){
 
         Player p = e.getEntity();
-        if(Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName()) && Ultimatevirus.getInstance().getConfig().getBoolean("RemoveVirusOnPlayerDeath")){
-            Ultimatevirus.getInstance().getRDatabase().setInfected(p, false);
+        if(plugin.getRDatabase().isInfected(p.getUniqueId()) && plugin.getConfig().getBoolean("RemoveVirusOnPlayerDeath")){
+            MainProcess.setHealthy(p, false);
         }
-
     }
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e){
         Player p = e.getPlayer();
 
-        if(Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName())){
+        if(plugin.getRDatabase().isInfected(p.getUniqueId())){
             //
             // Add potion effects to an infected player
             //
-            if(Ultimatevirus.getInstance().getConfig().getBoolean("EnablePotionEffectsWhenInfected")){
+            if(plugin.getConfig().getBoolean("EnablePotionEffectsWhenInfected")){
                 Random rand = new Random();
                 float result = rand.nextFloat();
                 if(result <= 2){
-                    int time = Ultimatevirus.getInstance().getConfig().getInt("PotionEffectsDuration");
-                    for (String s: Ultimatevirus.getInstance().getConfig().getStringList("PotionEffectsWhenInfected")) {
+                    int time = plugin.getConfig().getInt("PotionEffectsDuration");
+                    for (String s: plugin.getConfig().getStringList("PotionEffectsWhenInfected")) {
                         // Index 0: EffectType - Index 1: Amplifier
                         String[] splittedEffect = s.split("#");
 
@@ -94,15 +100,15 @@ public class PlayerEvents implements Listener {
             //
             // Generate particles when an infected player moves
             //
-            if(Ultimatevirus.getInstance().getConfig().getBoolean("ParticlesWhenInfected")){
+            if(plugin.getConfig().getBoolean("ParticlesWhenInfected")){
 
-                if(Ultimatevirus.getInstance().getVersion() < 9){
-                    Effect particle = Effect.valueOf(Ultimatevirus.getInstance().getConfig().getString("InfectionParticleType"));
+                if(plugin.getVersion() < 9){
+                    Effect particle = Effect.valueOf(plugin.getConfig().getString("InfectionParticleType"));
                     p.getWorld().playEffect(p.getLocation(), particle, 50, 15);
 
                     // Editable player location: new Location(p.getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ())
                 } else {
-                    Particle particle = Particle.valueOf(Ultimatevirus.getInstance().getConfig().getString("InfectionParticleType"));
+                    Particle particle = Particle.valueOf(plugin.getConfig().getString("InfectionParticleType"));
                     p.spawnParticle(particle, p.getLocation(), 5);
                 }
             }

@@ -1,7 +1,7 @@
 name: Ultimatevirus
 version: ${project.version}
 main: techwolfx.ultimatevirus.Ultimatevirus
-api-version: '1.13'
+api-version: 1.13
 authors: [MasterWolfx]
 description: Add a fully customizable virus to your server.
 softdepend: [PlaceholderAPI]

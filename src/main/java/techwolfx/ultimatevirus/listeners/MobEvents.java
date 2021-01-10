@@ -1,5 +1,6 @@
 package techwolfx.ultimatevirus.listeners;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
@@ -10,15 +11,22 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import techwolfx.ultimatevirus.utils.MainProcess;
 import techwolfx.ultimatevirus.Ultimatevirus;
-import techwolfx.ultimatevirus.files.Language;
+import techwolfx.ultimatevirus.files.LanguageFile;
 import java.util.List;
 import java.util.Random;
 
 public class MobEvents implements Listener {
 
+    private final Ultimatevirus plugin;
+
+    public MobEvents(Ultimatevirus plugin) {
+        this.plugin = plugin;
+    }
+
+
     @EventHandler
     public void onMobHit(EntityDamageByEntityEvent e){
-        boolean mobInfection = Ultimatevirus.getInstance().getConfig().getBoolean("EnableMobInfection");
+        boolean mobInfection = plugin.getConfig().getBoolean("EnableMobInfection");
         if(!mobInfection){
             return;
         }
@@ -28,13 +36,16 @@ public class MobEvents implements Listener {
 
         if(damager instanceof Monster && damaged instanceof Player){
 
-            List<String> enabledMobs = Ultimatevirus.getInstance().getConfig().getStringList("MobTypes");
-            String customName = Ultimatevirus.getInstance().getConfig().getString("CustomMobName").replace("&", "§").replace("%mob_type%", capitalizeMobTypeName( damager.getType().getName() ));
+            List<String> enabledMobs = plugin.getConfig().getStringList("MobTypes");
+            String customName = ChatColor.translateAlternateColorCodes('&',
+                    plugin.getConfig().getString("CustomMobName").replace("%mob_type%", capitalizeMobTypeName( damager.getType().getName() )) );
+
             boolean goAhead = false;
+
             for (String mob : enabledMobs){
                 // Check if the mob has the right custom name
-                if(damager.getType() == EntityType.fromName(mob.toUpperCase()) && damager.getCustomName() != null){
-                    if(damager.getCustomName().equals(customName)){
+                if (damager.getType() == EntityType.fromName(mob.toUpperCase()) && damager.getCustomName() != null){
+                    if (damager.getCustomName().equals(customName)){
                         goAhead = true;
                         break;
                     }
@@ -46,17 +57,17 @@ public class MobEvents implements Listener {
                 if(p.hasPermission("ultimatevirus.bypass")){
                     return;
                 }
-                int maskDmg = Ultimatevirus.getInstance().getConfig().getInt("MaskDmgOnInfectedMobHit");
+                int maskDmg = plugin.getConfig().getInt("MaskDmgOnInfectedMobHit");
                 // Send hit message only if the player is not infected
-                if(Ultimatevirus.getInstance().getConfig().getBoolean("PreventSpamInfectedMobHit")){
-                    if(!Ultimatevirus.getInstance().getRDatabase().isInfected(p.getName())){
-                        p.sendMessage(Language.getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
+                if(plugin.getConfig().getBoolean("PreventSpamInfectedMobHit")){
+                    if(!plugin.getRDatabase().isInfected(p.getUniqueId())){
+                        p.sendMessage(LanguageFile.getLangMsg("MsgHitByInfectedMob").replace("%mask_dmg%", Integer.toString(maskDmg)));
                     }
                 } else {
                     if(MainProcess.hasMask(p)){
-                        p.sendMessage(Language.getLangMsg("MsgHitByInfectedMobWithMask").replace("%mask_dmg%", Integer.toString(maskDmg)));
+                        p.sendMessage(LanguageFile.getLangMsg("MsgHitByInfectedMobWithMask").replace("%mask_dmg%", Integer.toString(maskDmg)));
                     } else {
-                        p.sendMessage(Language.getLangMsg("MsgHitByInfectedMob"));
+                        p.sendMessage(LanguageFile.getLangMsg("MsgHitByInfectedMob"));
                     }
                 }
 
@@ -67,7 +78,7 @@ public class MobEvents implements Listener {
 
     @EventHandler
     public void onMobSpawn(CreatureSpawnEvent e){
-        boolean mobInfection = Ultimatevirus.getInstance().getConfig().getBoolean("EnableMobInfection");
+        boolean mobInfection = plugin.getConfig().getBoolean("EnableMobInfection");
         if(!mobInfection){
             return;
         }
@@ -76,7 +87,7 @@ public class MobEvents implements Listener {
         }
 
         // Check if the mob is in a disabled world
-        List<String> disabledWorlds = Ultimatevirus.getInstance().getConfig().getStringList("DisabledWorlds");
+        List<String> disabledWorlds = plugin.getConfig().getStringList("DisabledWorlds");
         if (disabledWorlds.size() != 0) {
             for (String world : disabledWorlds) {
                 if (e.getEntity().getWorld().getName().equals(world)) {
@@ -86,7 +97,7 @@ public class MobEvents implements Listener {
         }
 
         // Check if the mob spawned is between the enabled mobs
-        List<String> enabledMobs = Ultimatevirus.getInstance().getConfig().getStringList("MobTypes");
+        List<String> enabledMobs = plugin.getConfig().getStringList("MobTypes");
         boolean goAhead = false;
 
         for (String mob : enabledMobs){
@@ -100,12 +111,12 @@ public class MobEvents implements Listener {
             return;
         }
 
-        String customName = Ultimatevirus.getInstance().getConfig().getString("CustomMobName");
+        String customName = plugin.getConfig().getString("CustomMobName");
 
         if (e.getEntity().getCustomName() == null) {
 
             Random rand = new Random();
-            int spreadChance = Ultimatevirus.getInstance().getConfig().getInt("MobInfectionSpreadChance");
+            int spreadChance = plugin.getConfig().getInt("MobInfectionSpreadChance");
             int result = rand.nextInt(100);
 
             if ( result <= spreadChance ){

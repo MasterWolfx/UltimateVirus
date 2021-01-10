@@ -2,8 +2,11 @@ package techwolfx.ultimatevirus.commands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import techwolfx.ultimatevirus.Ultimatevirus;
 
 public abstract class SubCommand {
+
+    public static final Ultimatevirus plugin = Ultimatevirus.getInstance();
 
     public abstract String getName();
 

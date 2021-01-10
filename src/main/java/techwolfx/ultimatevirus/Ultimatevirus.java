@@ -1,30 +1,26 @@
 package techwolfx.ultimatevirus;
 
-
 import org.bukkit.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import techwolfx.ultimatevirus.commands.CmdTabCompletion;
 import techwolfx.ultimatevirus.commands.CommandManager;
-import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
-import techwolfx.ultimatevirus.commands.subcommands.VaxinCMD;
 import techwolfx.ultimatevirus.database.Database;
 import techwolfx.ultimatevirus.database.SQLite;
-import techwolfx.ultimatevirus.files.Language;
+import techwolfx.ultimatevirus.files.LanguageFile;
 import techwolfx.ultimatevirus.listeners.MobEvents;
 import techwolfx.ultimatevirus.listeners.PlayerEvents;
 import techwolfx.ultimatevirus.placeholders.CustomPlaceholders;
 import techwolfx.ultimatevirus.utils.MainProcess;
+import techwolfx.ultimatevirus.utils.UltimatevirusUtils;
 import techwolfx.ultimatevirus.utils.VersionUtils;
 import java.util.List;
 import java.util.Objects;
 
-
 public final class Ultimatevirus extends JavaPlugin {
 
-    // Ultimatevirus instance
+    // UltimateVirus instance
     private static Ultimatevirus instance;
     public static Ultimatevirus getInstance(){
         return instance;
@@ -36,14 +32,17 @@ public final class Ultimatevirus extends JavaPlugin {
         return this.db;
     }
 
-    // Version
+    // Server version
     private int version;
     public int getVersion(){
         return version;
     }
 
     // Placeholders
-    public CustomPlaceholders myPlaceholder = null;
+    private boolean placeholdersEnabled;
+    public boolean arePalceholdersEnabled() {
+        return placeholdersEnabled;
+    }
 
     // Enable the plugin
     @Override
@@ -55,52 +54,53 @@ public final class Ultimatevirus extends JavaPlugin {
         saveDefaultConfig();
 
         // Setup lang.yml
-        Language.langFileSetup();
+        LanguageFile.langFileSetup();
 
         // Enabling database
         this.db = new SQLite(this);
         this.db.load();
 
         // Enabling custom recipes
-        if(getConfig().getBoolean("EnableMaskRecipe"))
+        if (getConfig().getBoolean("EnableMaskRecipe"))
             loadMaskCrafting();
-        if(getConfig().getBoolean("EnableVaxinRecipe"))
+        if (getConfig().getBoolean("EnableVaxinRecipe"))
             loadVaxinCrafting();
 
         // Check if PlaceholderAPI is enabled, and hook it
-        if(Ultimatevirus.getInstance().getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null){
             Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Hooked PlaceholderAPI.");
-            myPlaceholder = new CustomPlaceholders(this);
+            new CustomPlaceholders().register();
+            this.placeholdersEnabled = true;
         } else {
             Bukkit.getConsoleSender().sendMessage("§cCould not find PlaceholderAPI, some commands will not work properly.");
+            this.placeholdersEnabled = false;
         }
 
         // Register commands and events
-        getServer().getPluginManager().registerEvents(new MobEvents(), this);
-        getServer().getPluginManager().registerEvents(new PlayerEvents(), this);
+        getServer().getPluginManager().registerEvents(new MobEvents(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
         Objects.requireNonNull(getCommand("virus")).setExecutor(new CommandManager());
         Objects.requireNonNull(getCommand("virus")).setTabCompleter(new CmdTabCompletion());
 
         Bukkit.getConsoleSender().sendMessage("§a[UltimateVirus] Plugin Enabled.");
 
-        BukkitScheduler scheduler = getServer().getScheduler();
         int checkInterval = getConfig().getInt("InfectionSpreadDelay");
-        scheduler.scheduleSyncRepeatingTask(this, MainProcess::mainProcess, 0L, checkInterval*20);
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, MainProcess::mainProcess, 0L, checkInterval*20);
     }
 
     private void loadMaskCrafting(){
         List<String> pattern = getConfig().getStringList("custom-craftings.mask.pattern");
         List<String> items = getConfig().getStringList("custom-craftings.mask.ingredients");
 
-        if(pattern.size() != 3){
+        if (pattern.size() != 3) {
             Bukkit.getConsoleSender().sendMessage("§c[UltimateVirus] Mask crafting pattern is incorrect, ignoring it.");
             return;
         }
 
-        ItemStack maskItem = MaskCMD.getMask();
+        ItemStack maskItem = UltimatevirusUtils.getMask();
         ShapedRecipe maskRecipe;
 
-        if(version < 11){
+        if (version < 11) {
             maskRecipe = new ShapedRecipe(maskItem);
         } else {
             NamespacedKey key = new NamespacedKey(this, "virusMask");
@@ -120,7 +120,7 @@ public final class Ultimatevirus extends JavaPlugin {
                 }
             }
         } catch (Exception ex){
-            Bukkit.getLogger().warning("An error occured while enabling custom Mask crafting: ");
+            Bukkit.getLogger().warning("An error occurred while enabling custom Mask crafting: ");
             ex.printStackTrace();
             return;
         }
@@ -138,7 +138,7 @@ public final class Ultimatevirus extends JavaPlugin {
             return;
         }
 
-        ItemStack vaxinItem = VaxinCMD.getVaxin();
+        ItemStack vaxinItem = UltimatevirusUtils.getVaxin();
         ShapedRecipe vaxinRecipe;
 
         if(version < 11){
@@ -161,7 +161,7 @@ public final class Ultimatevirus extends JavaPlugin {
                 }
             }
         } catch (Exception ex){
-            Bukkit.getLogger().warning("An error occured while enabling custom Vaxin crafting: ");
+            Bukkit.getLogger().warning("An error occurred while enabling custom Vaxin crafting: ");
             ex.printStackTrace();
             return;
         }

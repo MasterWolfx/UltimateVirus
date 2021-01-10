@@ -1,28 +1,31 @@
 package techwolfx.ultimatevirus.utils;
 
+import org.bukkit.ChatColor;
 import techwolfx.ultimatevirus.Ultimatevirus;
+
+import java.util.UUID;
 
 public class PlaceholderUtils {
 
-    private static Ultimatevirus pl = Ultimatevirus.getInstance();
+    private static final Ultimatevirus plugin = Ultimatevirus.getInstance();
 
     /* Placeholders returns */
-    public static String isInfectedReturnMsg(String pName){
-        return pl.getRDatabase().isInfected(pName) ?
-                pl.getConfig().getString("ultimatevirus_isInfected.ReturnMsgWhenTrue").replace("&", "§")
+    public static String isInfectedReturnMsg(UUID uuid){
+        return plugin.getRDatabase().isInfected(uuid) ?
+                ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("ultimatevirus_isInfected.ReturnMsgWhenTrue"))
                 :
-                pl.getConfig().getString("ultimatevirus_isInfected.ReturnMsgWhenFalse").replace("&", "§");
+                ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("ultimatevirus_isInfected.ReturnMsgWhenFalse"));
     }
 
-    public static String infectedTitleReturnMsg(String pName){
-        return pl.getRDatabase().isInfected(pName) ?
-                pl.getConfig().getString("ultimatevirus_infectedTitle.ReturnMsgWhenTrue").replace("&", "§")
+    public static String infectedTitleReturnMsg(UUID uuid){
+        return plugin.getRDatabase().isInfected(uuid) ?
+                plugin.getConfig().getString("ultimatevirus_infectedTitle.ReturnMsgWhenTrue").replace("&", "§")
                 :
-                pl.getConfig().getString("ultimatevirus_infectedTitle.ReturnMsgWhenFalse").replace("&", "§");
+                plugin.getConfig().getString("ultimatevirus_infectedTitle.ReturnMsgWhenFalse").replace("&", "§");
     }
 
     public static int getTotalInfected(){
-        return pl.getRDatabase().getInfectedNumber();
+        return plugin.getRDatabase().getInfectedNumber();
     }
 
 }

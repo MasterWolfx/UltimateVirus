@@ -8,8 +8,8 @@ import techwolfx.ultimatevirus.Ultimatevirus;
 
 public class SQLite extends Database {
 
-    private String dbname;
-    private String SQLiteCreateTokensTable;
+    private final String dbname;
+    private final String SQLiteCreateTokensTable;
 
     public SQLite(Ultimatevirus instance){
         super(instance);

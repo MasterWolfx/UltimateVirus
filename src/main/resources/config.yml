@@ -29,8 +29,7 @@ InfectionPercentage: 40
 
 # Every time a player avoids a virus some "OnlinePoints" are added to his stats,
 # the more OnlinePoints he has the more chance he has to catch a virus next time.
-# These points will be added to the InfectionPercentage.
-# NOTE: these points are reset when a player catches a virus.
+# NOTE: These points will be added to the InfectionPercentage and are reset when a player catches the virus.
 OnlinePointsAddition: 5
 
 # NOTE: to apply recipes changes you must reload/restart the server.

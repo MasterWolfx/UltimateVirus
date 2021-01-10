@@ -1,49 +1,20 @@
 package techwolfx.ultimatevirus.commands.subcommands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
-import techwolfx.ultimatevirus.files.Language;
-
-import java.util.ArrayList;
-import java.util.List;
+import techwolfx.ultimatevirus.files.LanguageFile;
+import techwolfx.ultimatevirus.utils.UltimatevirusUtils;
 
 public class VaxinCMD extends SubCommand {
-
-    public static ItemStack getVaxin(){
-        String vaxinName = Ultimatevirus.getInstance().getConfig().getString("VaxinDisplayName").replace("&", "§");
-
-        ItemStack vaxin = new ItemStack(Material.POTION, 1);
-        ItemMeta im = vaxin.getItemMeta();
-        im.setDisplayName(vaxinName);
-        im.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
-        im.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-
-        List<String> lore = Ultimatevirus.getInstance().getConfig().getStringList("VaxinLore");
-        List<String> newLore = new ArrayList<>();
-        for (String line : lore) {
-            newLore.add(ChatColor.translateAlternateColorCodes('&', line));
-        }
-        im.setLore(newLore);
-
-        vaxin.setItemMeta(im);
-        return vaxin;
-    }
 
     private void giveVaxin(Player p){
         Inventory inv = p.getInventory();
 
-        inv.addItem(getVaxin());
-        p.sendMessage(Language.getLangMsg("MsgOnGiveVaxin"));
+        inv.addItem(UltimatevirusUtils.getVaxin());
+        p.sendMessage(LanguageFile.getLangMsg("MsgOnGiveVaxin"));
     }
 
     @Override

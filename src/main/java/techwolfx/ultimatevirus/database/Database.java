@@ -13,7 +13,7 @@ public abstract class Database {
 
     Ultimatevirus plugin;
     Connection connection;
-    String table = "player_infos";
+    final String table = "player_infos";
     public Database(Ultimatevirus instance){
         plugin = instance;
     }
@@ -50,27 +50,9 @@ public abstract class Database {
         }
     }
 
-    public void setInfected(Player player, boolean infected) {
-        checkConnection();
-        try (PreparedStatement ps = connection.prepareStatement("UPDATE " + table + " SET infected = '" + boolToInt(infected) + "' WHERE player = '" + player.getName() + "';")){
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     public void setInfected(UUID uuid, boolean infected) {
         checkConnection();
         try (PreparedStatement ps = connection.prepareStatement("UPDATE " + table + " SET infected = '" + boolToInt(infected) + "' WHERE uuid = '" + uuid.toString() + "';")){
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void setPoints(Player player, int points) {
-        checkConnection();
-        try (PreparedStatement ps = connection.prepareStatement("UPDATE " + table + " SET online_points = '" + points + "' WHERE player = '" + player.getName() + "';")){
             ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -87,41 +69,12 @@ public abstract class Database {
     }
 
     /* BOOL METHODS */
-    public boolean isPlayerRegistered(String pName){
-        checkConnection();
-        try (PreparedStatement ps = connection.prepareStatement("SELECT player FROM " + table +";"); ResultSet rs = ps.executeQuery() ) {
-            while(rs.next()){
-                if(rs.getString("player").equalsIgnoreCase(pName)){
-                    return true;
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
     public boolean isPlayerRegistered(UUID uuid){
         checkConnection();
         try (PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM " + table +";"); ResultSet rs = ps.executeQuery() ) {
             while(rs.next()){
                 if(rs.getString("uuid").equalsIgnoreCase(uuid.toString())){
                     return true;
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean isInfected(String pName) {
-        checkConnection();
-        try (PreparedStatement ps = connection.prepareStatement("SELECT infected, player FROM " + table + " WHERE player = '" + pName + "';"); ResultSet rs = ps.executeQuery()) {
-            //return intToBool(rs.getInt("infected"));
-            while (rs.next()) {
-                if (rs.getString("player").equalsIgnoreCase(pName)) {
-                    return intToBool(rs.getInt("infected"));
                 }
             }
         } catch (SQLException ex) {
@@ -145,11 +98,11 @@ public abstract class Database {
     }
 
     /* GET METHODS */
-    public int getPoints(Player player) {
+    public int getPoints(UUID uuid) {
         checkConnection();
-        try (PreparedStatement ps = connection.prepareStatement("SELECT player, online_points FROM " + table + " WHERE player = '" + player.getName() + "';"); ResultSet rs = ps.executeQuery();) {
+        try (PreparedStatement ps = connection.prepareStatement("SELECT uuid, online_points FROM " + table + " WHERE uuid = '" + uuid.toString() + "';"); ResultSet rs = ps.executeQuery()) {
             while(rs.next()){
-                if(rs.getString("player").equals(player.getName())){
+                if(rs.getString("uuid").equals(uuid.toString())){
                     return rs.getInt("online_points");
                 }
             }
@@ -161,7 +114,7 @@ public abstract class Database {
 
     public List<String> getInfected() {
         checkConnection();
-        try (PreparedStatement ps = connection.prepareStatement("SELECT player,infected FROM " + table + " WHERE infected = 1;"); ResultSet rs = ps.executeQuery(); ){
+        try (PreparedStatement ps = connection.prepareStatement("SELECT player, infected FROM " + table + " WHERE infected = 1;"); ResultSet rs = ps.executeQuery(); ){
             List<String> players = new ArrayList<>();
             while(rs.next()){
                 players.add(rs.getString("player"));

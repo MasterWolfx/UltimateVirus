@@ -7,20 +7,21 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import techwolfx.ultimatevirus.Ultimatevirus;
-import techwolfx.ultimatevirus.commands.subcommands.MaskCMD;
-import techwolfx.ultimatevirus.files.Language;
+import techwolfx.ultimatevirus.files.LanguageFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class MainProcess {
 
-    private static Ultimatevirus pl = Ultimatevirus.getInstance();
-    private static ArrayList<String> playersOnline = new ArrayList<>();
-    private static boolean debug = pl.getConfig().getBoolean("Debug");
+    private static final Ultimatevirus pl = Ultimatevirus.getInstance();
+    private static final ArrayList<String> playersOnline = new ArrayList<>();
+    private static boolean debug;
 
     public static void mainProcess(){
-        int minOnlinePlayers = pl.getConfig().getInt("MinOnlinePlayers");
+        debug = pl.getConfig().getBoolean("Debug");
+        final int minOnlinePlayers = pl.getConfig().getInt("MinOnlinePlayers");
+
         updateOnlinePlayersList();
 
         // Check if the minimum amount of players is online
@@ -43,7 +44,7 @@ public class MainProcess {
             }
 
             // Check if the pickedPlayer is already infected
-            if(pl.getRDatabase().isInfected(pickedPlayerName)){
+            if(pl.getRDatabase().isInfected(p.getUniqueId())){
                 if (debug) Bukkit.getConsoleSender().sendMessage("Player already infected: " + pickedPlayerName);
                 return;
             }
@@ -75,17 +76,21 @@ public class MainProcess {
             int result = rand.nextInt(100);
             if (debug) Bukkit.getConsoleSender().sendMessage("RANDOM NUMBER: " + result);
 
-            if ( result <= infectionProb + pl.getRDatabase().getPoints(p) + getChanceAddPerNearInfectedPlayer(p) ){
+            if ( result <= infectionProb + pl.getRDatabase().getPoints(p.getUniqueId()) + getChanceAddPerNearInfectedPlayer(p) ){
                 int maskDmg = pl.getConfig().getInt("MaskDmgOnVirusSave");
                 maskChecks(p, maskDmg);
             } else {
                 // The player avoided the virus, adding online points to his stats
                 int pointsAddition = pl.getConfig().getInt("OnlinePointsAddition");
 
-                if(pl.getRDatabase().getPoints(p) + infectionProb + pointsAddition <= 100){
-                    pl.getRDatabase().setPoints(p, pl.getRDatabase().getPoints(p) + pointsAddition);
-                } else if(pl.getRDatabase().getPoints(p) + infectionProb + pointsAddition > 100){
-                    pl.getRDatabase().setPoints(p, 100 - infectionProb);
+                if ( pl.getRDatabase().getPoints(p.getUniqueId()) + infectionProb + pointsAddition <= 100){
+
+                    pl.getRDatabase().setPoints(p.getUniqueId(), pl.getRDatabase().getPoints(p.getUniqueId()) + pointsAddition);
+
+                } else if ( pl.getRDatabase().getPoints(p.getUniqueId()) + infectionProb + pointsAddition > 100){
+
+                    pl.getRDatabase().setPoints(p.getUniqueId(), 100 - infectionProb);
+
                 }
 
                 if(debug) Bukkit.getConsoleSender().sendMessage("Virus avoided, skipping item check");
@@ -107,7 +112,7 @@ public class MainProcess {
         int result = 0;
         for(Player nearPlayer : Bukkit.getOnlinePlayers()){
             // If the healthy player is inside the range of an infected player
-            if( nearPlayer.getLocation().distance(target.getLocation()) <= distance && pl.getRDatabase().isInfected(nearPlayer.getName()) ){
+            if( nearPlayer.getLocation().distance(target.getLocation()) <= distance && pl.getRDatabase().isInfected(nearPlayer.getUniqueId()) ){
                 result += chanceAddNearInfected;
             }
         }
@@ -117,29 +122,31 @@ public class MainProcess {
     }
 
     public static void setInfected(Player p){
-        if(!pl.getRDatabase().isInfected(p.getName())){
-            p.sendTitle(Language.getLangMsg("OnInfection.Title"), Language.getLangMsg("OnInfection.Subtitle"));
+        if(!pl.getRDatabase().isInfected(p.getUniqueId())){
+            p.sendTitle(LanguageFile.getLangMsg("OnInfection.Title"), LanguageFile.getLangMsg("OnInfection.Subtitle"));
             if(pl.getConfig().getBoolean("BroadcastOnPlayerInfection")){
-                Bukkit.broadcastMessage(Language.getLangMsg("BroadcastOnPlayerInfection").replace("%player%", p.getName()));
+                Bukkit.broadcastMessage(LanguageFile.getLangMsg("BroadcastOnPlayerInfection").replace("%player%", p.getName()));
             }
         }
 
         int maxHealth = pl.getConfig().getInt("MaximumHealthWhenInfected");
         p.getPlayer().setMaxHealth(maxHealth);
 
-        pl.getRDatabase().setPoints(p, 0);
-        pl.getRDatabase().setInfected(p, true);
+        pl.getRDatabase().setPoints(p.getUniqueId(), 0);
+        pl.getRDatabase().setInfected(p.getUniqueId(), true);
     }
 
-    public static void setHealthy(Player p){
-        pl.getRDatabase().setInfected(p, false);
+    public static void setHealthy(Player p, boolean displayMsgs){
+        pl.getRDatabase().setInfected(p.getUniqueId(), false);
         p.setMaxHealth(20);
-        p.sendMessage(Language.getLangMsg("MsgOnRecover"));
         for(PotionEffect effect : p.getActivePotionEffects()){
             p.removePotionEffect(effect.getType());
         }
-        if(pl.getConfig().getBoolean("BroadcastOnPlayerCure")){
-            Bukkit.broadcastMessage(Language.getLangMsg("BroadcastOnPlayerCure").replace("%player%", p.getName()));
+        if(displayMsgs){
+            p.sendMessage(LanguageFile.getLangMsg("MsgOnRecover"));
+            if(pl.getConfig().getBoolean("BroadcastOnPlayerCure")){
+                Bukkit.broadcastMessage(LanguageFile.getLangMsg("BroadcastOnPlayerCure").replace("%player%", p.getName()));
+            }
         }
     }
 
@@ -155,7 +162,7 @@ public class MainProcess {
             if (debug) Bukkit.getConsoleSender().sendMessage("Checking item " + i);
 
             ItemStack item = inv.getItem(i);
-            if ( item != null && item.isSimilar(MaskCMD.getMask()) ) {
+            if ( item != null && item.isSimilar(UltimatevirusUtils.getMask()) ) {
 
                 // Checking mask durability: if it is negative, destroy it
                 if(item.getDurability() < item.getType().getMaxDurability() - maskDmg){
@@ -163,20 +170,19 @@ public class MainProcess {
 
                     // Mask low HP check
                     if (item.getDurability() >= item.getType().getMaxDurability() - hpStartWarnings){
-                        p.sendTitle(Language.getLangMsg("OnLowMaskHealth.Title"), Language.getLangMsg("OnLowMaskHealth.Subtitle").replace("%hp%", Short.toString((short)(item.getType().getMaxDurability() - item.getDurability()))) );
+                        p.sendTitle(LanguageFile.getLangMsg("OnLowMaskHealth.Title"), LanguageFile.getLangMsg("OnLowMaskHealth.Subtitle").replace("%hp%", Short.toString((short)(item.getType().getMaxDurability() - item.getDurability()))) );
                     }
 
                 } else {
                     inv.remove(item);
-                    p.sendTitle(Language.getLangMsg("OnMaskBreak.Title"), Language.getLangMsg("OnMaskBreak.Subtitle"));
+                    p.sendTitle(LanguageFile.getLangMsg("OnMaskBreak.Title"), LanguageFile.getLangMsg("OnMaskBreak.Subtitle"));
                 }
 
-                if(msgOnMaskHit) p.sendMessage(Language.getLangMsg("MsgOnMaskHit"));
+                if(msgOnMaskHit) p.sendMessage(LanguageFile.getLangMsg("MsgOnMaskHit"));
 
                 return;
 
             }
-
         }
 
         setInfected(p);
@@ -187,7 +193,7 @@ public class MainProcess {
         for(int i = 0 ; i < inv.getSize() ; i++){
             ItemStack item = inv.getItem(i);
             if(item != null) {
-                if (item.isSimilar(MaskCMD.getMask())) {
+                if (item.isSimilar(UltimatevirusUtils.getMask())) {
                     return true;
                 }
             }

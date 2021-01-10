@@ -25,31 +25,37 @@ public class RecoverCMD extends SubCommand {
 
     @Override
     public void perform(CommandSender sender, String[] args) {
+
         if(!sender.hasPermission("ultimatevirus.recover")){
             Player p = (Player) sender;
             invalidPermission(p);
             return;
         }
+
         if(args.length != 2){
             invalidArgs(sender);
             return;
         }
-        // If player already infected
-        if(Ultimatevirus.getInstance().getRDatabase().isInfected(args[1])){
-            try{
-                Player target = Bukkit.getPlayer(args[1]);
-                MainProcess.setHealthy(target);
-                msgOnOnStatusChange(sender, target.getName());
-            } catch (Exception exx){
-                invalidPlayer(sender);
+
+        Player p;
+        try {
+            p = Bukkit.getPlayer(args[1]);
+
+            // If player is infected
+            if(plugin.getRDatabase().isInfected(p.getUniqueId())){
+                msgOnOnStatusChange(sender, p);
+                MainProcess.setHealthy(p, true);
+            } else {
+                sender.sendMessage("§cError: "+p.getName()+" is not infected and can't be recovered.");
             }
-        } else {
-            sender.sendMessage("§cError: that player can't be recovered.");
+        } catch (Exception ex){
+            invalidPlayer(sender);
         }
+
     }
 
-    private void msgOnOnStatusChange(CommandSender sender, String targetName){
-        sender.sendMessage("§a%target% is now %status%.".replace("%target%", targetName)
-                .replace("%status%", Ultimatevirus.getInstance().getRDatabase().isInfected(targetName) ? "infected" : "healthy"));
+    private void msgOnOnStatusChange(CommandSender sender, Player p){
+        sender.sendMessage("§a%target% is now %status%.".replace("%target%", p.getName())
+                .replace("%status%", plugin.getRDatabase().isInfected(p.getUniqueId()) ? "infected" : "healthy"));
     }
 }

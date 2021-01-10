@@ -2,9 +2,8 @@ package techwolfx.ultimatevirus.commands.subcommands;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import techwolfx.ultimatevirus.Ultimatevirus;
 import techwolfx.ultimatevirus.commands.SubCommand;
-import techwolfx.ultimatevirus.files.Language;
+import techwolfx.ultimatevirus.files.LanguageFile;
 
 public class ReloadCMD extends SubCommand {
 
@@ -33,8 +32,8 @@ public class ReloadCMD extends SubCommand {
             }
         }
 
-        Ultimatevirus.getInstance().reloadConfig();
-        Language.reload();
+        plugin.reloadConfig();
+        LanguageFile.reload();
         sender.sendMessage("§aUltimateVirus files reloaded.");
     }
 }

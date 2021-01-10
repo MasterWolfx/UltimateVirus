@@ -7,7 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
-public class Language {
+public class LanguageFile {
 
     private static File file;
     private static FileConfiguration customFile;
@@ -75,6 +75,6 @@ public class Language {
     }
 
     public static String getLangMsg(String s){
-        return ChatColor.translateAlternateColorCodes('&', Language.get().getString(s));
+        return ChatColor.translateAlternateColorCodes('&', LanguageFile.get().getString(s));
     }
 }
